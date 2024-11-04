@@ -1,5 +1,6 @@
 <?php
 class Constants {
+    public const VERSION = "0.0.2";
 
     public const PLUGIN_NAME = "NSInternational";
     public const PLUGIN_DISPLAY_NAME = "NS International";

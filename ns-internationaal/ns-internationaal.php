@@ -1,4 +1,13 @@
 <?php
+/**
+* Plugin Name: NS International Plugin
+* Plugin URI: https://www.maikelvdb.nl/
+* Description: Deze plugin maakt meerdere NS International modules beschikbaar...
+* Version: 0.0.2
+* Author: Maikel van den Bosch
+* Author URI: https://www.maikelvdb.nl/
+**/
+
 
 
 include_once 'includes/settings.php';
@@ -115,12 +124,13 @@ function nsi_plugin_info( $res, $action, $args ){
 add_filter( 'site_transient_update_plugins', 'nsi_push_update' );
  function nsi_push_update( $transient ){
  
+	try {
 	if ( empty( $transient->checked ) ) {
 		return $transient;
 	}
 
-	$remote = wp_remote_get( 
-		$info_url,
+	$remote = wp_remote_get(
+		'https://raw.githubusercontent.com/maikelvdb/wp-nsi-modules-plugin/refs/heads/main/info.json',
 		array(
 			'timeout' => 10,
 			'headers' => array(
@@ -140,9 +150,11 @@ add_filter( 'site_transient_update_plugins', 'nsi_push_update' );
 	$remote = json_decode( wp_remote_retrieve_body( $remote ) );
  
 		// your installed plugin version should be on the line below! You can obtain it dynamically of course 
+
+	$current_version = Constants::VERSION;
 	if(
 		$remote
-		&& version_compare( $this->version, $remote->version, '<' )
+		&& version_compare( $current_version, $remote->version, '<' )
 		&& version_compare( $remote->requires, get_bloginfo( 'version' ), '<' )
 		&& version_compare( $remote->requires_php, PHP_VERSION, '<' )
 	) {
@@ -159,5 +171,8 @@ add_filter( 'site_transient_update_plugins', 'nsi_push_update' );
 	}
  
 	return $transient;
-
+} catch (Exception $e) {
+	echo $e;
+	return $transient;
+}
 }
