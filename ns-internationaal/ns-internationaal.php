@@ -48,6 +48,9 @@ wp_localize_script( 'modules-js', 'php_vars', $jsarray);
 wp_localize_script( 'settings-js', 'php_vars', $jsarray);
 
 
+
+$info_url = 'https://raw.githubusercontent.com/maikelvdb/wp-nsi-modules-plugin/refs/heads/main/info.json';
+
 add_filter( 'plugins_api', 'nsi_plugin_info', 20, 3);
 function nsi_plugin_info( $res, $action, $args ){
 
@@ -63,7 +66,7 @@ function nsi_plugin_info( $res, $action, $args ){
 
 	// info.json is the file with the actual plugin information on your server
 	$remote = wp_remote_get( 
-		'https://raw.githubusercontent.com/maikelvdb/wp-nsi-modules-plugin/refs/heads/main/info.json',
+		$info_url,
 		array(
 			'timeout' => 10,
 			'headers' => array(
@@ -114,5 +117,55 @@ function nsi_plugin_info( $res, $action, $args ){
 	}
 	
 	return $res;
+
+}
+
+add_filter( 'site_transient_update_plugins', 'nsi_push_update' );
+ function nsi_push_update( $transient ){
+ 
+	if ( empty( $transient->checked ) ) {
+		return $transient;
+	}
+
+	$remote = wp_remote_get( 
+		$info_url,
+		array(
+			'timeout' => 10,
+			'headers' => array(
+				'Accept' => 'application/json'
+			)
+		)
+	);
+
+	if(
+		is_wp_error( $remote )
+		|| 200 !== wp_remote_retrieve_response_code( $remote )
+		|| empty( wp_remote_retrieve_body( $remote ) )
+	) {
+		return $transient;
+	}
+	
+	$remote = json_decode( wp_remote_retrieve_body( $remote ) );
+ 
+		// your installed plugin version should be on the line below! You can obtain it dynamically of course 
+	if(
+		$remote
+		&& version_compare( $this->version, $remote->version, '<' )
+		&& version_compare( $remote->requires, get_bloginfo( 'version' ), '<' )
+		&& version_compare( $remote->requires_php, PHP_VERSION, '<' )
+	) {
+		
+		$res = new stdClass();
+		$res->slug = $remote->slug;
+		$res->plugin = plugin_basename( __FILE__ ); // it could be just YOUR_PLUGIN_SLUG.php if your plugin doesn't have its own directory
+		$res->new_version = $remote->version;
+		$res->tested = $remote->tested;
+		$res->package = $remote->download_url;
+		$transient->response[ $res->plugin ] = $res;
+		
+		//$transient->checked[$res->plugin] = $remote->version;
+	}
+ 
+	return $transient;
 
 }
