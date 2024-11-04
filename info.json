@@ -3,7 +3,7 @@
   "slug": "ns-international",
   "author": "<a href='https://maikelvdb.nl'>Maikel van den Bosch</a>",
   "author_profile": "https://maikelvdb.nl",
-  "version": "0.0.1-APLHA.002",
+  "version": "0.0.001",
   "download_url": "https://raw.githubusercontent.com/maikelvdb/wp-nsi-modules-plugin/refs/heads/main/ns-internationaal.zip",
   "requires": "3.0",
   "tested": "5.8",
