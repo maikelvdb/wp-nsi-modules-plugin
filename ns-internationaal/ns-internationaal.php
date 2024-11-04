@@ -1,12 +1,4 @@
 <?php
-/**
-* Plugin Name: NS International Plugin
-* Plugin URI: https://www.maikelvdb.nl/
-* Description: Deze plugin maakt meerdere NS International modules beschikbaar...
-* Version: 0.0.1-APLHA.001
-* Author: Maikel van den Bosch
-* Author URI: https://www.maikelvdb.nl/
-**/
 
 
 include_once 'includes/settings.php';
