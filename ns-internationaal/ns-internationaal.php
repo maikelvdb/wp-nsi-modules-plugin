@@ -63,7 +63,7 @@ function nsi_plugin_info( $res, $action, $args ){
 
 	// info.json is the file with the actual plugin information on your server
 	$remote = wp_remote_get( 
-		'https://rudrastyh.com/wp-content/uploads/updater/info.json',
+		'https://raw.githubusercontent.com/maikelvdb/wp-nsi-modules-plugin/refs/heads/main/info.json',
 		array(
 			'timeout' => 10,
 			'headers' => array(
@@ -105,11 +105,13 @@ function nsi_plugin_info( $res, $action, $args ){
 	if( ! empty( $remote->sections->screenshots ) ) {
 		$res->sections[ 'screenshots' ] = $remote->sections->screenshots;
 	}
-
-	$res->banners = array(
-		'low' => $remote->banners->low,
-		'high' => $remote->banners->high
-	);
+	
+	if( ! empty( $remote->banners ) ) {
+		$res->banners = array(
+			'low' => $remote->banners->low,
+			'high' => $remote->banners->high
+		);
+	}
 	
 	return $res;
 
