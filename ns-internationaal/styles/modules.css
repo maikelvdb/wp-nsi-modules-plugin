@@ -1,0 +1,382 @@
+@charset "UTF-8";
+@import url("https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css");
+:root {
+  --rgb-ns-blue: 0, 48, 130;
+  --ns-blue: rgb(var(--rgb-ns-blue));
+}
+
+.ns-from {
+  margin-block-start: 1.2rem;
+  margin-block-end: 0;
+  box-sizing: border-box;
+}
+.ns-from * {
+  box-sizing: border-box;
+}
+
+@media (max-width: 980px) {
+  .form-container {
+    flex-direction: column;
+  }
+  .form-container .button {
+    width: 100%;
+  }
+}
+.form-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 100px 80px;
+  gap: 10px;
+  max-width: var(--wp--style--global--content-size);
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: 5px 10px 5px 10px;
+  border-radius: 3px;
+  background-color: #f9f9f9;
+  font-family: var(--wp--preset--font-family--system-font);
+  font-size: var(--wp--preset--font-size--medium);
+}
+.form-container label {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+.form-container .filter-input {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+.form-container .filter-input .select-wrapper {
+  position: relative;
+  background-color: #fff;
+  border-radius: 3px;
+  outline: solid 3px transparent;
+  border: solid 1px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  line-height: 30px;
+  padding: 0 5px;
+  transition: all 0.3s ease-in-out;
+}
+.form-container .filter-input .select-wrapper:has([invalid=true]):not(:focus-within) {
+  border-color: rgba(255, 0, 0, 0.5);
+  outline-color: rgba(255, 0, 0, 0.1);
+}
+.form-container .filter-input .select-wrapper:focus-within {
+  background-color: var(--ns-blue);
+}
+.form-container .filter-input .select-wrapper:focus-within input {
+  background-color: var(--ns-blue);
+  color: #fff;
+}
+.form-container .filter-input .select-wrapper .options {
+  position: absolute;
+  top: 100%;
+  left: -1px;
+  right: -1px;
+  background-color: #fff;
+  border-left: solid 1px rgba(0, 0, 0, 0.1);
+  border-bottom: solid 1px rgba(0, 0, 0, 0.1);
+  border-right: solid 1px rgba(0, 0, 0, 0.1);
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.form-container .filter-input .select-wrapper .options .option {
+  line-height: 30px;
+  padding: 0 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  cursor: pointer;
+}
+.form-container .filter-input .select-wrapper .options .option:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.form-container .filter-input .select-wrapper .options .option:nth-child(odd) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.form-container .filter-input .select-wrapper .options .option:nth-child(odd):hover {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+.form-container .filter-input .select-wrapper input {
+  border: none;
+  outline: none;
+  transition: all 0.3s ease-in-out;
+}
+.form-container .js-date {
+  min-width: 100px;
+}
+.form-container .input {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+}
+.form-container .input input {
+  width: 100%;
+  padding: 0 5px;
+  border-radius: 3px;
+  outline: solid 3px transparent;
+  border: solid 1px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  line-height: 30px;
+  transition: all 0.3s ease-in-out;
+}
+.form-container .input input[invalid=true] {
+  border-color: rgba(255, 0, 0, 0.5) !important;
+  outline-color: rgba(255, 0, 0, 0.1) !important;
+}
+.form-container .button-wrapper {
+  display: flex;
+  align-items: flex-end;
+}
+.form-container .button {
+  padding: 0 20px;
+  line-height: 30px;
+  border-radius: 3px;
+  background-color: rgba(71, 133, 183, 0.8);
+  color: #fff;
+  outline: solid 3px transparent;
+  border: solid 1px #4785b7;
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+}
+.form-container .button:hover {
+  background-color: #4785b7;
+  outline-color: rgba(71, 133, 183, 0.3);
+  border-color: #396a92;
+}
+
+.ns-international_calendar {
+  box-sizing: border-box;
+  background-color: #f9f9f9;
+  border-radius: 3px;
+  padding: 10px;
+  overflow-x: hidden;
+}
+.ns-international_calendar * {
+  box-sizing: border-box;
+}
+.ns-international_calendar[data-current-index="0"] .prev {
+  display: none;
+}
+.ns-international_calendar[is-last] .next {
+  display: none;
+}
+.ns-international_calendar .ns-calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.ns-international_calendar .ns-calendar-header .prev,
+.ns-international_calendar .ns-calendar-header .next {
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  font-size: 20px;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--ns-blue);
+  color: #fff;
+}
+.ns-international_calendar .ns-calendar-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  gap: 10px;
+  transition: transform 0.7s ease-in-out;
+}
+.ns-international_calendar .ns-calendar-container .ns-calendar {
+  display: grid;
+  border-radius: 3px;
+  grid-template-columns: repeat(7, 1fr);
+  border: solid 1px rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.1);
+  gap: 2px;
+  min-width: 100%;
+}
+.ns-international_calendar .ns-calendar-container .ns-calendar .row {
+  display: contents;
+}
+.ns-international_calendar .ns-calendar-container .ns-calendar .row .cell {
+  position: relative;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.85);
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+}
+.ns-international_calendar .ns-calendar-container .ns-calendar .row .cell:hover {
+  background-color: #fff;
+}
+.ns-international_calendar .ns-calendar-container .ns-calendar .row .cell.disabled {
+  cursor: default;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+.ns-international_calendar .ns-calendar-container .ns-calendar .row .cell.disabled .daynr:before {
+  color: rgba(0, 0, 0, 0.2);
+}
+.ns-international_calendar .ns-calendar-container .ns-calendar .row .cell .daynr {
+  padding-top: 100%;
+}
+.ns-international_calendar .ns-calendar-container .ns-calendar .row .cell .daynr:before {
+  content: attr(data-day);
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  font-size: 13px;
+  font-weight: bold;
+}
+.ns-international_calendar .ns-calendar-container .ns-calendar .row .cell .price {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.ns-international_calendar .ns-calendar-container .ns-calendar .row .cell .price .current {
+  position: relative;
+  font-size: 13px;
+  border-radius: 5px;
+}
+.ns-international_calendar .ns-calendar-container .ns-calendar .row .cell .price .current:after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  right: 8px;
+  bottom: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.ns-international_calendar .ns-calendar-container .ns-calendar .row .cell .price.highest .current:after {
+  background-color: rgb(255, 0, 0);
+}
+.ns-international_calendar .ns-calendar-container .ns-calendar .row .cell .price.average .current:after {
+  background-color: rgb(255, 136, 0);
+}
+.ns-international_calendar .ns-calendar-container .ns-calendar .row .cell .price.lowest .current:after {
+  background-color: rgb(123, 179, 93);
+}
+.ns-international_calendar .ns-calendar-container .ns-calendar .row .cell .price:not(:empty) .current:before {
+  content: "€ ";
+}
+.ns-international_calendar .ns-calendar-container .ns-calendar .row .cell .price:has(.loader):before {
+  content: "";
+}
+
+.ns-international-dayschedule {
+  box-sizing: border-box;
+  background-color: #f9f9f9;
+  border-radius: 3px;
+  padding: 10px;
+}
+.ns-international-dayschedule * {
+  box-sizing: border-box;
+}
+.ns-international-dayschedule .form {
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 10px;
+}
+.ns-international-dayschedule .schedule {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ns-international-dayschedule .schedule .entry {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: #fff;
+  padding: 5px;
+  border-radius: 3px;
+  border: solid 1px rgba(0, 0, 0, 0.1);
+  outline: solid 3px rgba(0, 0, 0, 0.03);
+  min-height: 100px;
+  box-sizing: border-box;
+}
+.ns-international-dayschedule .schedule .entry * {
+  box-sizing: border-box;
+}
+.ns-international-dayschedule .schedule .entry .left {
+  flex-grow: 1;
+}
+.ns-international-dayschedule .schedule .entry .left .time {
+  width: 290px;
+  display: flex;
+  flex-direction: row;
+}
+.ns-international-dayschedule .schedule .entry .left .time .start,
+.ns-international-dayschedule .schedule .entry .left .time .end {
+  align-self: center;
+  font-size: 18px;
+  font-weight: bold;
+  width: 60px;
+}
+.ns-international-dayschedule .schedule .entry .left .time .start {
+  text-align: left;
+}
+.ns-international-dayschedule .schedule .entry .left .time .end {
+  text-align: right;
+}
+.ns-international-dayschedule .schedule .entry .left .time .duration {
+  align-self: center;
+  font-size: 13px;
+  width: 60px;
+  text-align: center;
+}
+.ns-international-dayschedule .schedule .entry .left .time .line {
+  flex-grow: 1;
+  position: relative;
+}
+.ns-international-dayschedule .schedule .entry .left .time .line:before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 50%;
+  bottom: 50%;
+  height: 0;
+  border-bottom: solid 1px var(--ns-blue);
+}
+.ns-international-dayschedule .schedule .entry .right {
+  flex-grow: 1;
+}
+
+.ns-international-dayschedule .center,
+.ns-international_calendar .center {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+}
+.ns-international-dayschedule .pt-10,
+.ns-international_calendar .pt-10 {
+  padding-top: 10px;
+}
+.ns-international-dayschedule .loader,
+.ns-international_calendar .loader {
+  align-self: center;
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(0, 0, 0, 0.05);
+  border-bottom-color: var(--ns-blue);
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}/*# sourceMappingURL=modules.css.map */
