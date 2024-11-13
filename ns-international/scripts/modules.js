@@ -165,6 +165,7 @@ const intervalStates = [];
     $(".ns-international-dayschedule").each(async function () {
       const $this = $(this);
       const $container = $this.find(".schedule");
+      $container.attr("data-has-more", "true");
 
       const $filterSelect = $this.find(".filter-input");
       const $filterHidden = $filterSelect.find("input[type='hidden']");
@@ -176,7 +177,10 @@ const intervalStates = [];
       }
 
       $filterSelect.data("callback", async function (code) {
-        $this.data("from", code);
+        const $input = $(this).find("input[type='hidden']");
+        const name = $input.attr("name");
+
+        $this.data(name, code);
         await renderDaySchedule($this, $container);
       });
 
@@ -238,8 +242,9 @@ const intervalStates = [];
 
   async function fetchAllSearchData(from, to, date, $container) {
     const search = await searchSchedule(from, to, date);
-    appendSearchDateToView(search.data, $container);
+    appendSearchDateToView(search.data, $container, date);
     if (search.fromCache) {
+      checkShowMore($container);
       $container.parent().find(".center").find(".loader").remove();
       return;
     }
@@ -259,7 +264,7 @@ const intervalStates = [];
   function recursiveLoadScroll(scroll, $container, sessionId, from, to, date) {
     loadSearchScroll(scroll.id, scroll.token, sessionId, from, to, date).then(
       (search) => {
-        appendSearchDateToView(search.data, $container);
+        appendSearchDateToView(search.data, $container, date);
 
         if (search.scroll) {
           recursiveLoadScroll(
@@ -271,19 +276,34 @@ const intervalStates = [];
             date
           );
         } else {
+          checkShowMore($container);
           $container.parent().find(".center").find(".loader").remove();
         }
       }
     );
   }
 
-  function appendSearchDateToView(data, $container) {
+  function checkShowMore($container) {
+    if ($container.find(".entry").length < 6) {
+      $container.removeAttr("data-has-more");
+    } else {
+      const $more = $('<div class="more"><span>Toon alles</span></div>');
+      $more.click(function () {
+        $container.removeAttr("data-has-more");
+        $container.find(".more").remove();
+      });
+
+      $container.append($more);
+    }
+  }
+
+  function appendSearchDateToView(data, $container, date) {
     data.forEach((entry) => {
       if ($container.find(`.entry[data-id="${entry.id}"]`).length) {
         return;
       }
 
-      const $element = createDayscheduleElement(entry);
+      const $element = createDayscheduleElement(entry, date);
       $container.append($element);
     });
   }
@@ -375,16 +395,38 @@ const intervalStates = [];
     });
   }
 
-  function createDayscheduleElement(entry) {
-    const $node = $(`<div class="entry"></div>`);
+  function createDayscheduleElement(entry, date) {
+    const origin = entry.itinerary.origin;
+    const destination = entry.itinerary.destination;
+
+    const departure = origin.departure.plannedLocalDateTime
+      .split("T")[1]
+      .replace(":", "")
+      .substring(0, 4);
+    const arival = destination.arrival.plannedLocalDateTime
+      .split("T")[1]
+      .replace(":", "")
+      .substring(0, 4);
+
+    const url = `https://www.nsinternational.com/traintracker/?tt=${
+      php_vars.tracking_code
+    }&r=%2Fnl%2Ftreintickets-v3%2F%23%2Fsearch%2F${origin.code}%2F${
+      destination.code
+    }%2F${date.substring(0, 10).replace(/-/g, "")}%2F${departure}%2F${arival}`;
+
+    const $node = $(`<a href="${url}" target="_blank" class="entry"></a>`);
     $node.attr("data-id", entry.id);
 
     const $left = $(`<div class="left"></div>`);
     const $right = $(`<div class="right"></div>`);
 
-    const origin = entry.itinerary.origin;
-    const destination = entry.itinerary.destination;
-    // const $date = $(`<div class="date">${}</div>`);
+    const $trains = $(
+      `<div class="trains">${getTransferDetails(
+        entry.itinerary.modalities
+      )}</div>`
+    );
+    $left.append($trains);
+
     const $time = $(
       `<div class="time">
         <div class="start">${getTime(
@@ -410,6 +452,17 @@ const intervalStates = [];
     return $node;
   }
 
+  function getTransferDetails(modalities) {
+    const trains = modalities.filter((x) => x.type.toUpperCase() === "TRAIN");
+
+    return (
+      `<span class="transfers">${trains.length - 1}x overstappen</span>` +
+      trains
+        .map((x) => `<span class="train">${x.name}</span>`)
+        .join(" <span class='separator-gt'>&gt;</span> ")
+    );
+  }
+
   function niceDuration(duration) {
     return duration.replace("PT", "").replace("H", "u").replace("M", "m");
   }
@@ -431,7 +484,9 @@ const intervalStates = [];
   }
 
   function getOfferPrice(offer) {
-    return offer?.totalPrice?.amount || "ntv";
+    return offer?.totalPrice?.amount
+      ? `<span class="price">&euro; ${offer?.totalPrice?.amount}</span>`
+      : `<span class="view">Bekijk prijzen</span>`;
   }
 
   function getTime(date) {

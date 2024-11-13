@@ -1,17 +1,12 @@
 {
-  "name": "NS International Plugin",
+  "name": "NS International modules",
   "slug": "ns-international",
   "author": "<a href='https://maikelvdb.nl'>Maikel van den Bosch</a>",
   "author_profile": "https://maikelvdb.nl",
-  "version": "0.0.2",
-  "download_url": "https://raw.githubusercontent.com/maikelvdb/wp-nsi-modules-plugin/refs/heads/main/ns-internationaal.zip",
+  "version": "0.0.6",
+  "download_url": "http://nsi-wp.maikelvdb.nl/ns-international.zip",
   "requires": "3.0",
   "tested": "5.8",
   "requires_php": "5.3",
-  "last_updated": "2024-11-04 16:45:00",
-  "sections": {
-    "description": "This simple plugin does nothing, only gets updates from a custom server",
-    "installation": "Click the activate button and that's it.",
-    "changelog": "<h4>1.0 –  1 august 2021</h4><ul><li>Bug fixes.</li><li>Initital release.</li></ul>"
-  }
+  "last_updated": "2024-11-04 18:18:00"
 }

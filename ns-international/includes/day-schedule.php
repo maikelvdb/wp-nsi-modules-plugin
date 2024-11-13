@@ -25,7 +25,7 @@ function renderNsInternationalDayschedule($attrs) {
     $fromDate = date('d-m-Y', strtotime(date('Y-m-d') . ' ' . $a['date-addition']));
     $content = "<div class=\"ns-international-dayschedule\" data-from=\"" . $a['from'] . "\" data-to=\"" . $a['to'] . "\" data-date=\"" . $fromDate . "\">";
 
-        $content .= "<div class=\"form form-container\">" . getForm($a['from'], $fromDate) . "</div>";
+        $content .= "<div class=\"form form-container\">" . getForm($a['from'], $a['to'], $fromDate) . "</div>";
         $content .= "<div class=\"schedule\"></div>";
 
     $content .= '</div>';
@@ -33,8 +33,9 @@ function renderNsInternationalDayschedule($attrs) {
     return $content;
 }
 
-function getForm($from, $date) {
+function getForm($from, $to, $date) {
     $form = renderNsStationsSelect("Vanaf station", "from", $from);
+    $form .= renderNsStationsSelect("Bestemming station", "to", $to);
     $form .= render_input("Vertrek op", "text", "date", $date, "js-date", ["min" => date('Y-m-d')]);
 
     return $form;
