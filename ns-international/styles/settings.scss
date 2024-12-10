@@ -39,9 +39,9 @@
         }
 
         &[data-code] {
-          border-color: var(--ns-blue);
+          border-color: var(--blue);
           background-color: #fff;
-          color: var(--ns-blue);
+          color: var(--blue);
 
           &:before {
             content: attr(data-code);
@@ -118,15 +118,15 @@
 
       &:hover {
         opacity: 1;
-        outline-color: rgba(var(--rgb-ns-blue), 0.2);
-        border-color: rgba(var(--rgb-ns-blue), 0.5);
+        outline-color: rgba(var(--rgb-blue), 0.2);
+        border-color: rgba(var(--rgb-blue), 0.5);
       }
 
       .cell {
         &.station__code {
           align-self: center;
           padding: 5px 10px;
-          background-color: var(--ns-blue);
+          background-color: var(--blue);
           color: #fff;
           font-size: 10px;
           border-radius: 5px;

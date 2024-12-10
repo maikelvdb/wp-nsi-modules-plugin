@@ -2,6 +2,7 @@
 include_once 'includes.php';
 
 function renderNsInternationalCalendar($attrs) {
+
     $a = shortcode_atts( array(
         'from' => '',
         'to'  =>  '',
@@ -25,18 +26,26 @@ function renderNsInternationalCalendar($attrs) {
         $dateStr = date('Y-m-d');
     }
 
+    // add 70 days
+    $date = new DateTime($dateStr);
+    $startDate = new DateTime($dateStr);
+    $startDate->modify('+70 days');
+
+    // get month floor diff but also with next year
+    $monthDiff = $date->diff($startDate)->m + ($date->diff($startDate)->y * 12);
+    $startIndex = $monthDiff;
+
     $tracking_code = get_option(Constants::TRACKING_CODE_KEY, '');
 
-    $content = "<div class=\"ns-international_calendar\" data-from=\"{$a['from']}\" data-to=\"{$a['to']}\" data-min-date=\"{$a['min-date']}\" data-current-index=\"0\">";
-
-    $date = new DateTime($dateStr);
+    $content = "<div class=\"ns-international_calendar\" data-from=\"{$a['from']}\" data-to=\"{$a['to']}\" data-min-date=\"{$a['min-date']}\" data-current-index=\"{$startIndex}\">";
+    
     $content .= "<div class=\"ns-calendar-header\">".
-        "<div class=\"ns-calendar-header-left\"><button class=\"prev\">&lt;</button></div>".
-        "<div class=\"ns-calendar-header-center js-active-date\">" . $date->format('F Y') . "</div>".
-        "<div class=\"ns-calendar-header-right\"><button class=\"next\">&gt;</button></div>".
+        "<div class=\"ns-calendar-header-left\"><button class=\"prev\"><div class=\"arrow\"></div></button></div>".
+        "<div class=\"ns-calendar-header-center js-active-date\">" . strftime("%B", $startDate->getTimestamp()) . "</div>". //$date->format('F Y')
+        "<div class=\"ns-calendar-header-right\"><button class=\"next\"><div class=\"arrow\"></div></button></div>".
     "</div>";
 
-        $content .= "<div class=\"ns-calendar-container\">";
+        $content .= "<div class=\"ns-calendar-container\"><div class=\"ns-calendar-slider\">";
     
         $content .= createCalendar($date->format('Y-m-d'), 0, $tracking_code, $a['from'], $a['to']);
 
@@ -44,9 +53,10 @@ function renderNsInternationalCalendar($attrs) {
             $newDate = clone $date;
             $newDate->modify("+{$x} month");
             
-        $content .= createCalendar($newDate->format('Y-m-d'), $x, $tracking_code, $a['from'], $a['to']);
+            $content .= createCalendar($newDate->format('Y-m-d'), $x, $tracking_code, $a['from'], $a['to']);
         }
 
+        $content .= "</div>";
         $content .= "</div>";
     $content .= "</div>";
 
@@ -72,10 +82,11 @@ function createCalendar($date, $index, $tracking_code, $from, $to) {
     }
 
     $activeClass = $index == 0 ? 'active' : '';
-    $content = "<div class=\"ns-calendar {$activeClass}\" data-date-str=\"{$firstDayDate->format('F Y')}\" data-date=\"{$firstDayDate->format('Y-m-d')}\" data-index=\"{$index}\">";
+    $monthName = strftime("%B", $firstDayDate->getTimestamp());
+    $content = "<div class=\"ns-calendar {$activeClass}\" data-date-str=\"{$monthName}\" data-date=\"{$firstDayDate->format('Y-m-d')}\" data-index=\"{$index}\">";
     $content .= "<div class=\"row header\">" .
-        "<div class=\"cell\">Mon</div><div class=\"cell\">Tue</div><div class=\"cell\">Wed</div>" .
-        "<div class=\"cell\">Thu</div><div class=\"cell\">Fri</div><div class=\"cell\">Sat</div><div class=\"cell\">Sun</div>" .
+        "<div class=\"cell\">M</div><div class=\"cell\">D</div><div class=\"cell\">W</div>" .
+        "<div class=\"cell\">D</div><div class=\"cell\">V</div><div class=\"cell\">Z</div><div class=\"cell\">Z</div>" .
     "</div>";
     
     $currentDate = clone $startDate;

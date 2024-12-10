@@ -1,4 +1,4 @@
-const API_URL = "https://nsi.maikelvdb.nl/api";
+const API_URL = "https://nsi-api.goedkoop-treinkaartje.nl/api";
 // const API_URL = "https://localhost:7096/api";
 
 async function searchStations(name) {
@@ -114,4 +114,53 @@ async function loadSearchScroll(id, headerToken, sessionId, from, to, date) {
     sessionId: sessionId,
     scroll: scrollObj,
   };
+}
+
+const slash = "%2F";
+function getBaseTrackingUrl() {
+  return `https://www.nsinternational.com/traintracker/?tt=${php_vars.tracking_code}&r=%2Fnl%2Ftreintickets-v3%2F%23%2Fsearch%2F`;
+}
+
+function getTrackingUrl(from, to, date, departure, arival) {
+  let path = `${from}${slash}${to}`;
+
+  if (date) {
+    path += `${slash}${date}`;
+  }
+
+  if (departure) {
+    path += `${slash}${departure}`;
+  }
+
+  if (arival) {
+    path += `${slash}${arival}`;
+  }
+
+  return getBaseTrackingUrl() + path;
+}
+
+function toPrice(price) {
+  return price.toLocaleString("nl-NL", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+}
+
+function toFullPrice(price) {
+  const [whole, fraction] = price
+    .toLocaleString("nl-NL", {
+      style: "currency",
+      currency: "EUR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    })
+    .split(",");
+
+  if (!fraction) {
+    return whole;
+  }
+
+  return `${whole}<span class="fraction">,${fraction.padEnd(2, "0")}</span>`;
 }

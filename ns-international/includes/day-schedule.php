@@ -34,9 +34,9 @@ function renderNsInternationalDayschedule($attrs) {
 }
 
 function getForm($from, $to, $date) {
-    $form = renderNsStationsSelect("Vanaf station", "from", $from);
-    $form .= renderNsStationsSelect("Bestemming station", "to", $to);
-    $form .= render_input("Vertrek op", "text", "date", $date, "js-date", ["min" => date('Y-m-d')]);
+    $form = renderNsStationsSelect(TextValues::get("from"), "from", $from);
+    $form .= renderNsStationsSelect(TextValues::get("to"), "to", $to);
+    $form .= render_input(TextValues::get("date"), "text", "date", $date, "js-date", ["min" => date('Y-m-d')]);
 
     return $form;
 }

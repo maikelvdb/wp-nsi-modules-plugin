@@ -1,8 +1,21 @@
 @charset "UTF-8";
 @import url("https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css");
 :root {
-  --rgb-ns-blue: 0, 48, 130;
-  --ns-blue: rgb(var(--rgb-ns-blue));
+  --rgb-blue: 0, 48, 130;
+  --blue: rgb(var(--rgb-blue));
+  --rgb-primary: 240, 80, 110;
+  --primary: rgb(var(--rgb-primary));
+  --cta: rgb(var(--rgb-primary));
+  --rgb-grey: 239, 239, 239;
+  --grey: rgb(var(--rgb-grey));
+  --background-grey: var(--grey);
+  --border: solid 1px var(--grey);
+  --border-radius-size: 7px;
+  --nsi-shadow: 0 2px 8px rgba(19, 41, 104, 0.1);
+  --nsi-button: #ffc917;
+  --nsi-button-hover: #ffb51a;
+  --db-button: #ec0016;
+  --db-button-hover: #c50014;
 }
 
 .input-saver {
@@ -37,9 +50,9 @@
 }
 .stations__search .preview_settings .stations .from[data-code],
 .stations__search .preview_settings .stations .to[data-code] {
-  border-color: var(--ns-blue);
+  border-color: var(--blue);
   background-color: #fff;
-  color: var(--ns-blue);
+  color: var(--blue);
 }
 .stations__search .preview_settings .stations .from[data-code]:before,
 .stations__search .preview_settings .stations .to[data-code]:before {
@@ -99,13 +112,13 @@
 }
 .stations__search .stations_list .row:hover {
   opacity: 1;
-  outline-color: rgba(var(--rgb-ns-blue), 0.2);
-  border-color: rgba(var(--rgb-ns-blue), 0.5);
+  outline-color: rgba(var(--rgb-blue), 0.2);
+  border-color: rgba(var(--rgb-blue), 0.5);
 }
 .stations__search .stations_list .row .cell.station__code {
   align-self: center;
   padding: 5px 10px;
-  background-color: var(--ns-blue);
+  background-color: var(--blue);
   color: #fff;
   font-size: 10px;
   border-radius: 5px;

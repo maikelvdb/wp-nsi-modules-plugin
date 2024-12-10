@@ -1,4 +1,17 @@
 :root {
-  --rgb-ns-blue: 0, 48, 130;
-  --ns-blue: rgb(var(--rgb-ns-blue));
+  --rgb-blue: 0, 48, 130;
+  --blue: rgb(var(--rgb-blue));
+  --rgb-primary: 240, 80, 110;
+  --primary: rgb(var(--rgb-primary));
+  --cta: rgb(var(--rgb-primary));
+  --rgb-grey: 239, 239, 239;
+  --grey: rgb(var(--rgb-grey));
+  --background-grey: var(--grey);
+  --border: solid 1px var(--grey);
+  --border-radius-size: 7px;
+  --nsi-shadow: 0 2px 8px rgba(19, 41, 104, 0.1);
+  --nsi-button: #ffc917;
+  --nsi-button-hover: #ffb51a;
+  --db-button: #ec0016;
+  --db-button-hover: #c50014;
 }/*# sourceMappingURL=shared.css.map */

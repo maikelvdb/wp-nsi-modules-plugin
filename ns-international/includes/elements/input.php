@@ -1,14 +1,14 @@
 <?php
 
 function render_input($label, $type, $name, $value, $className = "", $attributes = []) {
-    $Content = "<div class=\"input " . $className . "\">";
-        $Content .= "<label for=\"" . $name . "\">" . $label . "</label>";
-        $Content .= "<input type=\"" . $type . "\" id=\"" . $name . "\" name=\"" . $name . "\" value=\"" . $value . "\"";
+    $Content = "<label for=\"" . $name . "\" class=\"input " . $className . "\">";
+        // $Content .= "<span  class=\"label\">" . $label . "</span>";
+        $Content .= "<input type=\"" . $type . "\" placeholder=\"" . $label . "\" id=\"" . $name . "\" name=\"" . $name . "\" value=\"" . $value . "\"";
         foreach($attributes as $key => $val) {
             $Content .= " " . $key . "=\"" . $val . "\"";
         }
         $Content .= " />";
-    $Content .= "</div>";
+    $Content .= "</label>";
 
     return $Content;
 }

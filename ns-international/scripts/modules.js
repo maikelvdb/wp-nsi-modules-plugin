@@ -6,194 +6,6 @@ const intervalStates = [];
       setDatePicker($(this));
     });
 
-    $(".ns-international_searchform").each(function () {
-      const $this = $(this);
-      const $form = $this.find("form");
-      $form.submit(function (event) {
-        event.preventDefault();
-
-        const $dateInput = $this.find('input[name="date"]');
-        const $fromDisplay = $this.find('input[name="from_display"]');
-        const $toDisplay = $this.find('input[name="to_display"]');
-
-        $dateInput.attr("invalid", false);
-        $fromDisplay.attr("invalid", false);
-        $toDisplay.attr("invalid", false);
-
-        let valid = true;
-        const fromCode = $this.find('input[name="from"]').val();
-        if (!fromCode) {
-          $fromDisplay.attr("invalid", true);
-          valid = false;
-        }
-
-        const toCode = $this.find('input[name="to"]').val();
-        if (!toCode) {
-          $toDisplay.attr("invalid", true);
-          valid = false;
-        }
-
-        let date = $dateInput.val();
-        if (!date) {
-          $dateInput.attr("invalid", true);
-          valid = false;
-        }
-
-        if (!valid) {
-          return;
-        }
-
-        date = date.split("-").reverse().join("");
-        const url = `https://www.nsinternational.com/traintracker/?tt=${php_vars.tracking_code}&r=%2Fnl%2Ftreintickets-v3%2F%23%2Fsearch%2F${fromCode}%2F${toCode}%2F${date}`;
-
-        window.open(url, "_blank");
-      });
-    });
-
-    $(".ns-international_calendar").each(async function () {
-      const $this = $(this);
-      const from = $(this).data("from");
-      const to = $(this).data("to");
-      const minDate = $(this).data("min-date");
-
-      const $next = $(this).find(".next");
-      const $prev = $(this).find(".prev");
-      const $container = $(this).find(".ns-calendar-container");
-      const $calendars = $container.find(".ns-calendar");
-      let maxIndex = -1;
-
-      const slideCalendar = function () {
-        const current = $this.attr("data-current-index") ?? 0;
-        const currentIndex = parseInt(current, 10);
-
-        $container[0].style.transform = `translateX(calc(${
-          currentIndex * -100
-        }% - ${currentIndex * 10}px))`;
-      };
-
-      $next.click(async function () {
-        const currentIndex = $this.data("current-index");
-        const newIndex = currentIndex + 1;
-        $this.attr("data-current-index", newIndex);
-        $this.data("current-index", newIndex);
-
-        const dateName = $this
-          .find('[data-index="' + newIndex + '"]')
-          .data("date-str");
-
-        $this.find(".js-active-date").text(dateName);
-
-        if (newIndex == maxIndex) {
-          $this.attr("is-last", true);
-        }
-
-        slideCalendar();
-      });
-
-      $prev.click(async function () {
-        const currentIndex = $this.data("current-index");
-        const newIndex = currentIndex - 1;
-        $this.attr("data-current-index", newIndex);
-        $this.data("current-index", newIndex);
-
-        const dateName = $this
-          .find('[data-index="' + newIndex + '"]')
-          .data("date-str");
-
-        $this.find(".js-active-date").text(dateName);
-
-        $this.removeAttr("is-last");
-
-        slideCalendar();
-      });
-
-      const data = await loadCalendar(from, to, minDate);
-      const allDates = data.calendarEntries.map(
-        (x) => new Date(x.calendarDate)
-      );
-      const maxDate = new Date(Math.max.apply(null, allDates));
-      const maxYear = maxDate.getFullYear();
-      const maxMonth = maxDate.getMonth();
-
-      $calendars.each(function () {
-        const $calendar = $(this);
-        const dt = new Date($calendar.data("date"));
-        const year = dt.getFullYear();
-        const month = dt.getMonth();
-
-        if (year >= maxYear && month > maxMonth) {
-          $calendar.remove();
-          return;
-        }
-
-        maxIndex++;
-
-        $calendar.find(".row:not(.header) > .cell").each(function (index) {
-          const $cell = $(this);
-          const date = $cell.data("date");
-          const realDate = new Date(date);
-          const currentMonth = realDate.getMonth();
-
-          const dateDate = data.calendarEntries.find(
-            (entry) => entry.calendarDate === date
-          );
-
-          if (!dateDate || month !== currentMonth) {
-            $cell.addClass("disabled");
-            $cell.find(".loader").remove();
-
-            $cell.attr("href", "javascript:void(0)");
-            $cell.css("cursur", "default");
-
-            return;
-          }
-
-          const $price = $cell.find(".price");
-          $price.find(".loader").remove();
-
-          if (!dateDate.price?.lowest) {
-            $cell.addClass("disabled");
-            return;
-          }
-
-          $price.append(`<div class="current">${dateDate.price.lowest}</div>`);
-          $price.addClass(dateDate.price.category.toLowerCase());
-        });
-      });
-    });
-
-    $(".ns-international-dayschedule").each(async function () {
-      const $this = $(this);
-      const $container = $this.find(".schedule");
-      $container.attr("data-has-more", "true");
-
-      const $filterSelect = $this.find(".filter-input");
-      const $filterHidden = $filterSelect.find("input[type='hidden']");
-      const $fitlerInput = $filterSelect.find("input[type='text']");
-      const code = $filterHidden.val();
-      if (code) {
-        const name = await getStationByCode(code);
-        $fitlerInput.val(name);
-      }
-
-      $filterSelect.data("callback", async function (code) {
-        const $input = $(this).find("input[type='hidden']");
-        const name = $input.attr("name");
-
-        $this.data(name, code);
-        await renderDaySchedule($this, $container);
-      });
-
-      const $dateInput = $this.find(".js-date");
-      $dateInput.find("input").data("callback", async function (date) {
-        $this.data("date", date);
-
-        await renderDaySchedule($this, $container);
-      });
-
-      await renderDaySchedule($this, $container);
-    });
-
     $(".filter-input").each(async function () {
       const $select = $(this);
       const $input = $select.find("input[type='text']");
@@ -205,14 +17,6 @@ const intervalStates = [];
         $input.val(name);
       }
 
-      $select.click(function (event) {
-        if (event.target.tagName === "INPUT") {
-          return;
-        }
-
-        $input.focus();
-      });
-
       $input.focus(renderStationsEvent);
       $input.keyup(renderStationsEvent);
 
@@ -221,108 +25,88 @@ const intervalStates = [];
         delete intervalStates[name];
 
         setTimeout(() => {
-          $(this).parent().find(".options").remove();
+          $(".nsi-options").remove();
+
+          const $callbackWrapper = $(this).closest(".filter-input");
+          const $wrapper = $(this).parent();
+          const station = $(this).data("station");
+          if (station) {
+            $(this).val(station.name);
+            $codeInput.val(station.beneCode);
+
+            const callback = $callbackWrapper.data("callback");
+            if (callback) {
+              callback.call($callbackWrapper, station.beneCode);
+            }
+            return;
+          }
+
+          const val = $(this).val();
+          const stations = $wrapper.data("stations");
+          const found = stations.find(
+            (s) => s.name === val || s.beneCode === val
+          );
+
+          if (found) {
+            $codeInput.val(found.beneCode);
+            const callback = $callbackWrapper.data("callback");
+            if (callback) {
+              callback.call($callbackWrapper, found.beneCode);
+            }
+          } else {
+            $(this).val("");
+            $codeInput.val("");
+            $(this).data("station", undefined);
+          }
         }, 200);
+      });
+    });
+
+    $(".ns-form-switch").each(function () {
+      const $this = $(this);
+      const $fromInput = $("#from");
+      const $fromCodeInput = $fromInput.next();
+      const $toInput = $("#to");
+      const $toCodeInput = $fromInput.next();
+
+      $this.click(async function () {
+        await new Promise((resolve) => setTimeout(resolve, 200));
+
+        const from = $fromInput.val();
+        const fromCode = $fromCodeInput.val();
+
+        const to = $toInput.val();
+        const toCode = $toCodeInput.val();
+
+        $fromInput.val(to);
+        $fromCodeInput.val(toCode);
+
+        $toInput.val(from);
+        $toCodeInput.val(fromCode);
       });
     });
   });
 
-  async function renderDaySchedule($this, $container) {
-    const from = $this.data("from");
-    const to = $this.data("to");
-    const dateStr = $this.data("date");
-
-    const date = dateStr.split("-").reverse().join("-") + "T00:00:00";
-
-    $container.empty();
-
-    $container.after($('<div class="center pt-10"></div>').append(loader()));
-    await fetchAllSearchData(from, to, date, $container);
-  }
-
-  async function fetchAllSearchData(from, to, date, $container) {
-    const search = await searchSchedule(from, to, date);
-    appendSearchDateToView(search.data, $container, date);
-    if (search.fromCache) {
-      checkShowMore($container);
-      $container.parent().find(".center").find(".loader").remove();
-      return;
-    }
-
-    if (search.scroll) {
-      recursiveLoadScroll(
-        search.scroll,
-        $container,
-        search.sessionId,
-        from,
-        to,
-        date
-      );
-    }
-  }
-
-  function recursiveLoadScroll(scroll, $container, sessionId, from, to, date) {
-    loadSearchScroll(scroll.id, scroll.token, sessionId, from, to, date).then(
-      (search) => {
-        appendSearchDateToView(search.data, $container, date);
-
-        if (search.scroll) {
-          recursiveLoadScroll(
-            search.scroll,
-            $container,
-            sessionId,
-            from,
-            to,
-            date
-          );
-        } else {
-          checkShowMore($container);
-          $container.parent().find(".center").find(".loader").remove();
-        }
+  function renderStationsEvent(event) {
+    setTimeout(() => {
+      if (event.type === "keyup") {
+        $(this).data("station", undefined);
       }
-    );
-  }
+      const $input = $(this);
+      const name = $input.data("name");
 
-  function checkShowMore($container) {
-    if ($container.find(".entry").length < 6) {
-      $container.removeAttr("data-has-more");
-    } else {
-      const $more = $('<div class="more"><span>Toon alles</span></div>');
-      $more.click(function () {
-        $container.removeAttr("data-has-more");
-        $container.find(".more").remove();
-      });
-
-      $container.append($more);
-    }
-  }
-
-  function appendSearchDateToView(data, $container, date) {
-    data.forEach((entry) => {
-      if ($container.find(`.entry[data-id="${entry.id}"]`).length) {
+      if (intervalStates[name]) {
+        window.clearInterval(intervalStates[name]);
+        delete intervalStates[name];
         return;
       }
 
-      const $element = createDayscheduleElement(entry, date);
-      $container.append($element);
-    });
-  }
-
-  function renderStationsEvent() {
-    const $input = $(this);
-    const name = $input.data("name");
-
-    if (intervalStates[name]) {
-      window.clearInterval(intervalStates[name]);
-      delete intervalStates[name];
-      return;
-    }
-
-    const value = $(this).val();
-    intervalStates[name] = window.setTimeout(
-      () => renderStationOptions(value, $(this).parent()),
-      100
-    );
+      const value = $(this).val();
+      intervalStates[name] = window.setTimeout(
+        () => renderStationOptions(value, $(this).parent()),
+        100
+      );
+    }, 300);
   }
 
   async function renderStationOptions(value, $wrapper) {
@@ -331,50 +115,63 @@ const intervalStates = [];
       return;
     }
 
-    await new Promise((resolve) =>
-      setTimeout(() => {
-        $wrapper.find(".options").remove();
-        resolve();
-      }, 100)
-    );
+    let $list = $(".nsi-options");
+    if ($list.length) {
+      await new Promise((resolve) =>
+        setTimeout(() => {
+          $(".nsi-options").find("*").remove();
+          resolve();
+        }, 100)
+      );
+    } else {
+      $list = $('<div class="nsi-options"></div>');
+      const offset = $wrapper.offset();
+      $list.css({
+        top: offset.top + $wrapper.outerHeight() - 2,
+        left: offset.left - 10,
+        width: $wrapper.outerWidth() + 20,
+      });
+      $("body").append($list);
+    }
 
     if (value.length < 3) {
       return;
     }
 
-    const $list = $('<div class="options"></div>');
-
     const stations = await searchStations(value);
+    $wrapper.data("stations", stations);
 
+    const currentCode = $wrapper.find("input[type='hidden']").val();
     stations.forEach((station) => {
+      const isActive = currentCode === station.beneCode;
+      if (isActive) {
+        // $input.data("station", station);
+      }
+
       const $option = $(`
-        <div class="option" data-value="${station.beneCode}" data-display="${station.name}" title="${station.name}">
+        <div class="option ${isActive ? "active" : ""}" data-value="${
+        station.beneCode
+      }" data-display="${station.name}" title="${station.name}">
           <span class="name">${station.name}</span>
         </div>
       `);
 
-      $option.click(function () {
+      $option.click(function (event) {
+        event.preventDefault();
+
         $wrapper = $(this).closest(".filter-input");
-        $invalid = $wrapper.find("[invalid]");
+        const $invalid = $wrapper.find("[invalid]");
         if ($invalid.length) {
           $invalid.removeAttr("invalid");
         }
 
         const $valueInput = $wrapper.find("input[type='text']");
         $valueInput.val(station.name);
-        setTimeout(() => $valueInput.blur(), 0);
-
-        $wrapper.find("input[type='hidden']").val(station.beneCode);
-        const callback = $wrapper.data("callback");
-        if (callback) {
-          callback.call($wrapper, station.beneCode);
-        }
+        $valueInput.data("station", station);
       });
 
       $list.append($option);
     });
-
-    $wrapper.append($list);
   }
 
   function setDatePicker($elem) {
@@ -393,111 +190,5 @@ const intervalStates = [];
         }
       },
     });
-  }
-
-  function createDayscheduleElement(entry, date) {
-    const origin = entry.itinerary.origin;
-    const destination = entry.itinerary.destination;
-
-    const departure = origin.departure.plannedLocalDateTime
-      .split("T")[1]
-      .replace(":", "")
-      .substring(0, 4);
-    const arival = destination.arrival.plannedLocalDateTime
-      .split("T")[1]
-      .replace(":", "")
-      .substring(0, 4);
-
-    const url = `https://www.nsinternational.com/traintracker/?tt=${
-      php_vars.tracking_code
-    }&r=%2Fnl%2Ftreintickets-v3%2F%23%2Fsearch%2F${origin.code}%2F${
-      destination.code
-    }%2F${date.substring(0, 10).replace(/-/g, "")}%2F${departure}%2F${arival}`;
-
-    const $node = $(`<a href="${url}" target="_blank" class="entry"></a>`);
-    $node.attr("data-id", entry.id);
-
-    const $left = $(`<div class="left"></div>`);
-    const $right = $(`<div class="right"></div>`);
-
-    const $trains = $(
-      `<div class="trains">${getTransferDetails(
-        entry.itinerary.modalities
-      )}</div>`
-    );
-    $left.append($trains);
-
-    const $time = $(
-      `<div class="time">
-        <div class="start">${getTime(
-          origin.departure.plannedLocalDateTime
-        )}</div>
-        <div class="line"></div>
-        <div class="duration">${niceDuration(entry.itinerary.duration)}</div>
-        <div class="line"></div>
-        <div class="end">${getTime(
-          destination.arrival.plannedLocalDateTime
-        )}</div>
-      </div>`
-    );
-    $left.append($time);
-
-    $node.append($left);
-
-    const offer = getLowestOffer(entry);
-    const $price = $(`<div class="price">${getOfferPrice(offer)}</div>`);
-    $right.append($price);
-    $node.append($right);
-
-    return $node;
-  }
-
-  function getTransferDetails(modalities) {
-    const trains = modalities.filter((x) => x.type.toUpperCase() === "TRAIN");
-
-    return (
-      `<span class="transfers">${trains.length - 1}x overstappen</span>` +
-      trains
-        .map((x) => `<span class="train">${x.name}</span>`)
-        .join(" <span class='separator-gt'>&gt;</span> ")
-    );
-  }
-
-  function niceDuration(duration) {
-    return duration.replace("PT", "").replace("H", "u").replace("M", "m");
-  }
-
-  function getLowestOffer(entry) {
-    if (!entry.offers?.length) {
-      return null;
-    }
-
-    let lowest = null;
-    for (const offer of entry.offers) {
-      if (offer.totalPrice.amount > 0) {
-        lowest = offer;
-        break;
-      }
-    }
-
-    return lowest;
-  }
-
-  function getOfferPrice(offer) {
-    return offer?.totalPrice?.amount
-      ? `<span class="price">&euro; ${offer?.totalPrice?.amount}</span>`
-      : `<span class="view">Bekijk prijzen</span>`;
-  }
-
-  function getTime(date) {
-    const dt = new Date(date);
-    return `${dt.getHours().toString().padStart(2, "0")}:${dt
-      .getMinutes()
-      .toString()
-      .padStart(2, "0")}`;
-  }
-
-  function loader() {
-    return $('<div class="loader"></div>');
   }
 })(jQuery);
