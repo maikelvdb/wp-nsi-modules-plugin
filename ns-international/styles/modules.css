@@ -54,7 +54,6 @@
   .ns-from .form-container .ns-stations-group .filter-input {
     max-width: 100%;
     border-radius: var(--border-radius-size) !important;
-    border: solid 1px rgba(0, 0, 0, 0.1) !important;
   }
   .ns-from .form-container .ns-stations-group .filter-input .option {
     line-height: 40px !important;
@@ -544,7 +543,6 @@
   .ns-international-dayschedule .form-container .ns-stations-group .filter-input {
     max-width: 100%;
     border-radius: var(--border-radius-size) !important;
-    border: solid 1px rgba(0, 0, 0, 0.1) !important;
   }
   .ns-international-dayschedule .form-container .ns-stations-group .filter-input .option {
     line-height: 40px !important;
@@ -881,7 +879,6 @@
   .form-container .ns-stations-group .filter-input {
     max-width: 100%;
     border-radius: var(--border-radius-size) !important;
-    border: solid 1px rgba(0, 0, 0, 0.1) !important;
   }
   .form-container .ns-stations-group .filter-input .option {
     line-height: 40px !important;
