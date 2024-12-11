@@ -23,6 +23,10 @@
   margin-block-start: 1.2rem;
   margin-block-end: 0;
   box-sizing: border-box;
+  max-width: var(--nsi-max-width);
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-bottom: var(--nsi-margin-bottom);
 }
 .ns-from * {
   box-sizing: border-box;
@@ -87,9 +91,6 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  max-width: var(--wp--style--global--content-size);
-  margin-left: auto !important;
-  margin-right: auto !important;
   padding: 25px;
   border-radius: var(--border-radius-size);
   background-color: #fff;
@@ -171,6 +172,13 @@
   background-color: transparent;
   font-size: 16px;
 }
+.form-container .input input::-moz-placeholder, .form-container .filter-input input::-moz-placeholder {
+  color: #4e4e4e;
+}
+.form-container .input input::placeholder,
+.form-container .filter-input input::placeholder {
+  color: #4e4e4e;
+}
 .form-container .filter-input {
   flex-grow: 1;
 }
@@ -189,6 +197,12 @@
 }
 .form-container .js-date input {
   max-width: 100%;
+}
+.form-container .js-date input::-moz-placeholder {
+  color: #4e4e4e;
+}
+.form-container .js-date input::placeholder {
+  color: #4e4e4e;
 }
 .form-container .button-wrapper {
   display: flex;
@@ -215,12 +229,16 @@
 }
 
 .ns-international_calendar {
+  max-width: var(--nsi-max-width);
+  margin-left: auto !important;
+  margin-right: auto !important;
   container-type: inline-size;
   box-shadow: var(--nsi-shadow);
   box-sizing: border-box;
   color: #fff;
   border-radius: var(--border-radius-size);
   overflow-x: hidden;
+  margin-bottom: var(--nsi-margin-bottom);
 }
 @container (max-width: 540px) {
   .ns-international_calendar .ns-calendar-container {
@@ -356,12 +374,22 @@
   flex-direction: column;
   justify-content: space-around;
   color: rgb(0, 0, 1);
+  border: none;
+  outline: none;
 }
 .ns-international_calendar .ns-calendar-container .ns-calendar-slider .ns-calendar .row.header .cell:first-child {
   border-radius: var(--border-radius-size) 0 0 0;
 }
 .ns-international_calendar .ns-calendar-container .ns-calendar-slider .ns-calendar .row.header .cell:last-child {
   border-radius: 0 var(--border-radius-size) 0 0;
+}
+.ns-international_calendar .ns-calendar-container .ns-calendar-slider .ns-calendar .row.header .cell:hover {
+  background-color: rgba(255, 255, 255, 0.85);
+  transform: none;
+  border: none;
+  outline: none;
+  border-radius: 0;
+  z-index: 10;
 }
 .ns-international_calendar .ns-calendar-container .ns-calendar-slider .ns-calendar .row .cell {
   position: relative;
@@ -467,11 +495,15 @@
 
 .ns-international-dayschedule {
   container-type: inline-size;
+  max-width: var(--nsi-max-width);
+  margin-left: auto !important;
+  margin-right: auto !important;
   box-sizing: border-box;
   background-color: #fff;
   box-shadow: var(--nsi-shadow);
   border-radius: var(--border-radius-size);
   padding: 15px;
+  margin-bottom: var(--nsi-margin-bottom);
 }
 .ns-international-dayschedule * {
   box-sizing: border-box;

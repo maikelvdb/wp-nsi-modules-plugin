@@ -7,6 +7,10 @@
   margin-block-start: 1.2rem;
   margin-block-end: 0;
   box-sizing: border-box;
+  max-width: var(--nsi-max-width);
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-bottom: var(--nsi-margin-bottom);
 
   * {
     box-sizing: border-box;
@@ -26,9 +30,6 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  max-width: var(--wp--style--global--content-size);
-  margin-left: auto !important;
-  margin-right: auto !important;
   padding: 25px;
   border-radius: var(--border-radius-size);
   background-color: #fff;
@@ -122,6 +123,10 @@
       outline: none;
       background-color: transparent;
       font-size: 16px;
+
+      &::placeholder {
+        color: #4e4e4e;
+      }
     }
   }
 
@@ -148,6 +153,10 @@
 
     input {
       max-width: 100%;
+
+      &::placeholder {
+        color: #4e4e4e;
+      }
     }
   }
 
@@ -179,12 +188,16 @@
 }
 
 .ns-international_calendar {
+  max-width: var(--nsi-max-width);
+  margin-left: auto !important;
+  margin-right: auto !important;
   container-type: inline-size;
   box-shadow: var(--nsi-shadow);
   box-sizing: border-box;
   color: #fff;
   border-radius: var(--border-radius-size);
   overflow-x: hidden;
+  margin-bottom: var(--nsi-margin-bottom);
 
   @container (max-width: 540px) {
     @include ns-international-calendar-small;
@@ -297,6 +310,8 @@
               flex-direction: column;
               justify-content: space-around;
               color: rgba(0, 0, 0.5);
+              border: none;
+              outline: none;
 
               &:first-child {
                 border-radius: var(--border-radius-size) 0 0 0;
@@ -304,6 +319,15 @@
 
               &:last-child {
                 border-radius: 0 var(--border-radius-size) 0 0;
+              }
+
+              &:hover {
+                background-color: rgba(255, 255, 255, 0.85);
+                transform: none;
+                border: none;
+                outline: none;
+                border-radius: 0;
+                z-index: 10;
               }
             }
           }
@@ -449,11 +473,15 @@
 
 .ns-international-dayschedule {
   container-type: inline-size;
+  max-width: var(--nsi-max-width);
+  margin-left: auto !important;
+  margin-right: auto !important;
   box-sizing: border-box;
   background-color: #fff;
   box-shadow: var(--nsi-shadow);
   border-radius: var(--border-radius-size);
   padding: 15px;
+  margin-bottom: var(--nsi-margin-bottom);
 
   * {
     box-sizing: border-box;

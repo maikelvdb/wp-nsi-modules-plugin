@@ -3,10 +3,11 @@ include_once 'includes.php';
 
 
 function renderNsInternationalDayschedule($attrs) {
+    $skipDays = get_option(Constants::SKIP_DAYS, '70');
     $a = shortcode_atts( array(
         'from' => '',
         'to'  =>  '',
-        'date-addition' => '+1 day'
+        'date-addition' => "+$skipDays day"
     ), $attrs );
 
     if (empty($a['to'])) {
@@ -22,8 +23,12 @@ function renderNsInternationalDayschedule($attrs) {
         }
     }
 
+    
+    $maxWidth = get_option(Constants::MAX_WIDTH, '900');
+    $marginBottom = get_option(Constants::SPACING_BOTTOM, '15');
+
     $fromDate = date('d-m-Y', strtotime(date('Y-m-d') . ' ' . $a['date-addition']));
-    $content = "<div class=\"ns-international-dayschedule\" data-from=\"" . $a['from'] . "\" data-to=\"" . $a['to'] . "\" data-date=\"" . $fromDate . "\">";
+    $content = "<div class=\"ns-international-dayschedule\" style=\"--nsi-max-width: {$maxWidth}px; --nsi-margin-bottom: {$marginBottom}px;\" data-from=\"" . $a['from'] . "\" data-to=\"" . $a['to'] . "\" data-date=\"" . $fromDate . "\">";
 
         $content .= "<div class=\"form form-container\">" . getForm($a['from'], $a['to'], $fromDate) . "</div>";
         $content .= "<div class=\"schedule\"></div>";

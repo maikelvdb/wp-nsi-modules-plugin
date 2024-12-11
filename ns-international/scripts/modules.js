@@ -131,6 +131,8 @@ const intervalStates = [];
         left: offset.left - 10,
         width: $wrapper.outerWidth() + 20,
       });
+
+      $list.data("wrapper", $wrapper);
       $("body").append($list);
     }
 
@@ -159,7 +161,9 @@ const intervalStates = [];
       $option.click(function (event) {
         event.preventDefault();
 
-        $wrapper = $(this).closest(".filter-input");
+        const $currList = $(".nsi-options");
+        $wrapper = $currList.data("wrapper");
+
         const $invalid = $wrapper.find("[invalid]");
         if ($invalid.length) {
           $invalid.removeAttr("invalid");

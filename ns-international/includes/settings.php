@@ -46,6 +46,9 @@ function addGeneralSettings() {
 	// data fields
 	register_setting( Constants::PLUGIN_SLUG, Constants::TRACKING_CODE_KEY, 'string' );
 	register_setting( Constants::PLUGIN_SLUG, Constants::DEFAULT_FROM_STATION, 'string' );
+	register_setting( Constants::PLUGIN_SLUG, Constants::MAX_WIDTH, 'string' );
+	register_setting( Constants::PLUGIN_SLUG, Constants::SKIP_DAYS, 'string' );
+	register_setting( Constants::PLUGIN_SLUG, Constants::SPACING_BOTTOM, 'string' );
 
 	// form
 	add_settings_section(
@@ -70,6 +73,54 @@ function addGeneralSettings() {
 	);
 	
 	add_settings_field(
+		Constants::MAX_WIDTH,
+		'Maximale breedte modules', // label
+		'inputField',
+		Constants::PLUGIN_SLUG,
+		$section,
+		array(
+			'label_for' => Constants::MAX_WIDTH,
+			'class' => Constants::MAX_WIDTH, // for <tr> element
+			'name' => Constants::MAX_WIDTH, // pass any custom parameters
+			'saver' => false,
+			'type' => 'number',
+			'value' => '900'
+		)
+	);
+	
+	add_settings_field(
+		Constants::SPACING_BOTTOM,
+		'Margin onderkant modules', // label
+		'inputField',
+		Constants::PLUGIN_SLUG,
+		$section,
+		array(
+			'label_for' => Constants::SPACING_BOTTOM,
+			'class' => Constants::SPACING_BOTTOM, // for <tr> element
+			'name' => Constants::SPACING_BOTTOM, // pass any custom parameters
+			'saver' => false,
+			'type' => 'number',
+			'value' => '15'
+		)
+	);
+	
+	add_settings_field(
+		Constants::SKIP_DAYS,
+		'Aantal dagen vooruit modules', // label
+		'inputField',
+		Constants::PLUGIN_SLUG,
+		$section,
+		array(
+			'label_for' => Constants::SKIP_DAYS,
+			'class' => Constants::SKIP_DAYS, // for <tr> element
+			'name' => Constants::SKIP_DAYS, // pass any custom parameters
+			'saver' => false,
+			'type' => 'number',
+			'value' => '70'
+		)
+	);
+	
+	add_settings_field(
 		Constants::DEFAULT_FROM_STATION,
 		'Default vertrek station code', // label
 		'inputField',
@@ -86,10 +137,13 @@ function addGeneralSettings() {
 
 function inputField( $args ){
 	$default_value = isset($args['value']) ? $args['value'] : '';
+	$type = isset($args['type']) ? $args['type'] : 'text';
+
 	$saveBtn = $args['saver'] ? '<input type="submit" name="submit" id="submit" class="button button-primary" value="Save Changes" />' : '';
 	printf(
-		'<div class="input-saver"><input type="text" id="%s" name="%s" value="%s" class="ns-input" />
+		'<div class="input-saver"><input type="%s" id="%s" name="%s" value="%s" class="ns-input" />
 		%s</div>',
+		$type,
 		$args[ 'name' ],
 		$args[ 'name' ],
 		get_option( $args[ 'name' ], $default_value),

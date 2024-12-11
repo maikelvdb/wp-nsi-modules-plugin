@@ -8,6 +8,9 @@ class Constants {
 
     public const TRACKING_CODE_KEY = "tracking_code";
     public const GENERAL_FIELDS = "ns_international_general";
+    public const MAX_WIDTH = "ns_international_max_width";
+    public const SKIP_DAYS = "ns_international_skip_days";
+    public const SPACING_BOTTOM = "ns_international_spacing_bottom";
 
     public const DEFAULT_FROM_STATION = "default_from_station";
 }

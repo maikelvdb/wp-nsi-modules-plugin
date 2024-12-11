@@ -13,7 +13,9 @@ function renderNsInternationalSearch($atts) {
     }
 
 
-	$content = "<div class=\"ns-international_searchform ns-from\"><form action=\"#\" methode=\"get\" class=\"form-container\">";
+    $maxWidth = get_option(Constants::MAX_WIDTH, '900');
+    $marginBottom = get_option(Constants::SPACING_BOTTOM, '15');
+	$content = "<div class=\"ns-international_searchform ns-from\" style=\"--nsi-max-width: {$maxWidth}px; --nsi-margin-bottom: {$marginBottom}px;\"><form action=\"#\" methode=\"get\" class=\"form-container\">";
         
     $content .= "<div class=\"ns-stations-group\">";
         $content .= renderNsStationsSelect(TextValues::get("from"), "from", $a['from']);
@@ -22,8 +24,8 @@ function renderNsInternationalSearch($atts) {
     $content .= "</div>";
 
     $content .= render_input(TextValues::get("date"), "text", "date", date('d-m-Y', strtotime(date('Y-m-d') . ' +1 day')), "js-date", ["min" => date('Y-m-d')]);
-    $content .= "<div class=\"button-wrapper\">" . render_button(TextValues::get("search")) . "</div>";
-    $content .= "</div></div>";
+    $content .= "<div class=\"button-wrapper\">" . render_button(TextValues::get("search"), "nsi-cta") . "</div>";
+    $content .= "</form></div>";
 
     return $content;
 }
