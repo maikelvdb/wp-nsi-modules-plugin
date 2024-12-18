@@ -8,5 +8,6 @@ include_once 'includes/modules-settings.php';
 include_once 'includes/plugin-settings.php';
 
 setlocale(LC_TIME, 'NL_nl');
+
 setModuleSettings();
 setPluginSettings();

@@ -1,5 +1,5 @@
 const API_URL = "https://nsi-api.goedkoop-treinkaartje.nl/api";
-// const API_URL = "https://localhost:7096/api";
+//const API_URL = "https://localhost:7096/api";
 
 async function searchStations(name) {
   if (name.length < 3) {
