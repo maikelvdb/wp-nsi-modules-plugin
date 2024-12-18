@@ -8,16 +8,20 @@ async function searchStations(name) {
 
   const url = `${API_URL}/stations/${name}`;
 
-  const response = await fetch(url);
-  const data = await response.json();
+  try {
+    const response = await fetchData(url);
+    const data = await response.json();
 
-  return data;
+    return data;
+  } catch {
+    return null;
+  }
 }
 
 async function getStationByCode(code) {
   const url = `${API_URL}/stations/bene/${code}`;
 
-  const response = await fetch(url);
+  const response = await fetchData(url);
   const data = await response.json();
   if (!data) {
     return "";
@@ -29,7 +33,7 @@ async function getStationByCode(code) {
 async function loadCalendar(from, to, date) {
   const url = `${API_URL}/calendar/${from}/${to}`;
 
-  const response = await fetch(url);
+  const response = await fetchData(url);
   const data = await response.json();
 
   return data;
@@ -38,37 +42,45 @@ async function loadCalendar(from, to, date) {
 async function loadDayschedule(from, to, date) {
   const url = `${API_URL}/dayschedule/${from}/${to}/${date}`;
 
-  const response = await fetch(url);
-  const data = await response.json();
+  try {
+    const response = await fetchData(url);
+    const data = await response.json();
 
-  return data;
+    return data;
+  } catch {
+    return null;
+  }
 }
 
 async function searchSchedule(from, to, date) {
   const url = `${API_URL}/search/${from}/${to}/${date}`;
 
-  const response = await fetch(url);
-  const sessionId = response.headers.get("X-Session-Id");
-  const fromCache = response.headers.get("x-from-cache");
+  try {
+    const response = await fetchData(url);
+    const sessionId = response.headers.get("X-Session-Id");
+    const fromCache = response.headers.get("x-from-cache");
 
-  const data = await response.json();
+    const data = await response.json();
 
-  let scrollObj = null;
-  if (data.data.scroll.later === "NEXT_DEPARTURE") {
-    scrollObj = {
-      id: data.data.scroll.searchId,
-      token: response.headers.get("x-nsiapi-convid"),
+    let scrollObj = null;
+    if (data.data.scroll.later === "NEXT_DEPARTURE") {
+      scrollObj = {
+        id: data.data.scroll.searchId,
+        token: response.headers.get("x-nsiapi-convid"),
+      };
+    } else if (fromCache !== "1") {
+      searchScheduleSetCache(from, to, date, data, response.headers);
+    }
+
+    return {
+      data: data.data.travelOffers,
+      sessionId: sessionId,
+      scroll: scrollObj,
+      fromCache: fromCache === "1",
     };
-  } else if (fromCache !== "1") {
-    searchScheduleSetCache(from, to, date, data, response.headers);
+  } catch {
+    return null;
   }
-
-  return {
-    data: data.data.travelOffers,
-    sessionId: sessionId,
-    scroll: scrollObj,
-    fromCache: fromCache === "1",
-  };
 }
 
 async function searchScheduleSetCache(from, to, date, response, headers) {
@@ -79,7 +91,7 @@ async function searchScheduleSetCache(from, to, date, response, headers) {
     value: x[1],
   }));
 
-  fetch(url, {
+  fetchData(url, {
     method: "POST",
     body: JSON.stringify({
       duration: 60,
@@ -92,7 +104,7 @@ async function searchScheduleSetCache(from, to, date, response, headers) {
 async function loadSearchScroll(id, headerToken, sessionId, from, to, date) {
   const url = `${API_URL}/SearchScroll/${id}/${headerToken}`;
 
-  const response = await fetch(url, {
+  const response = await fetchData(url, {
     headers: {
       "X-Session-Id": sessionId,
     },
@@ -163,4 +175,10 @@ function toFullPrice(price) {
   }
 
   return `${whole}<span class="fraction">,${fraction.padEnd(2, "0")}</span>`;
+}
+
+async function fetchData(url, options) {
+  return await fetch(url, options ?? null)
+    .then((response) => response)
+    .catch(() => null);
 }

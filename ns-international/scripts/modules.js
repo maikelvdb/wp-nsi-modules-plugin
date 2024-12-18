@@ -124,6 +124,10 @@ const intervalStates = [];
         }, 100)
       );
     } else {
+      if (value.length < 3) {
+        return;
+      }
+
       $list = $('<div class="nsi-options"></div>');
       const offset = $wrapper.offset();
       $list.css({
@@ -141,7 +145,7 @@ const intervalStates = [];
     }
 
     const stations = await searchStations(value);
-    $wrapper.data("stations", stations);
+    $wrapper.data("stations", stations ?? []);
 
     const currentCode = $wrapper.find("input[type='hidden']").val();
     stations.forEach((station) => {

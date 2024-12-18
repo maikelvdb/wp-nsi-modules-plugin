@@ -3,19 +3,17 @@
 function setModuleSettings() {
     $tracking_code = get_option(Constants::TRACKING_CODE_KEY, '');
     $plugin_url = str_replace("/includes", "", plugin_dir_url( __FILE__ ));
-    $wp_scripts = wp_scripts();
 
     wp_enqueue_script( 'jquery' );
-    wp_register_script( 'google-jquery-ui', 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.14.0/jquery-ui.min.js', array( 'jquery' ) );
     wp_enqueue_style( 'jquery-style' );
-    wp_enqueue_script( 'google-jquery-ui' );
+    wp_enqueue_script('jquery-ui-datepicker');
 
     wp_enqueue_style(
-    'plugin_name-admin-ui-css',
-    'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.14.0/themes/base/jquery-ui.min.css',
-    false,
-    "1.0",
-    false
+        'plugin_name-admin-ui-css',
+        'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.14.0/themes/base/jquery-ui.min.css',
+        false,
+        "1.0",
+        'all'
     );
 
     wp_enqueue_style('modules-style',  $plugin_url . "styles/modules.css");
@@ -44,4 +42,5 @@ function setModuleSettings() {
     wp_localize_script( 'calendar-js', 'php_vars', $jsarray);
     wp_localize_script( 'day-schedule-js', 'php_vars', $jsarray);
     wp_localize_script( 'settings-js', 'php_vars', $jsarray);
+
 }

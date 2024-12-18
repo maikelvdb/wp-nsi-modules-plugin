@@ -22,5 +22,6 @@ class TextValues {
         'transfer_amount' => '#x overstappen',
         'show_all' => 'Toon alles',
         'search_tickets' => 'Zoek tickets',
+        'error-no-data' => 'Kan geen gegevens ophalen, probeer het later opnieuw.',
     ];
 }

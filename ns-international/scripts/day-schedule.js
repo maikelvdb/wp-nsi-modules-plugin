@@ -45,6 +45,14 @@
 
     async function fetchAllSearchData(from, to, date, $container) {
       const search = await searchSchedule(from, to, date);
+
+      if (!search) {
+        const $error = $('<div class="nsi-error"></div>');
+        $error.text(php_vars.text_values["error-no-data"]);
+        $container.parent().find(".center").append($error);
+        $container.parent().find(".center").find(".loader").remove();
+        return;
+      }
       appendSearchDateToView(search.data, $container, date);
       if (search.fromCache) {
         checkShowMore($container);
