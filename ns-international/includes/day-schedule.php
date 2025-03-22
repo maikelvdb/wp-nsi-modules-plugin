@@ -39,8 +39,9 @@ function renderNsInternationalDayschedule($attrs) {
 }
 
 function getForm($from, $to, $date) {
-    $form = renderNsStationsSelect(TextValues::get("from"), "from", $from);
-    $form .= renderNsStationsSelect(TextValues::get("to"), "to", $to);
+    $id = uniqid();
+    $form = renderNsStationsSelect(TextValues::get("from"), "from", $from, $id . '_from');
+    $form .= renderNsStationsSelect(TextValues::get("to"), "to", $to, $id . '_to');
     $form .= render_input(TextValues::get("date"), "text", "date", $date, "js-date", ["min" => date('Y-m-d')]);
 
     return $form;

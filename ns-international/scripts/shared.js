@@ -1,5 +1,5 @@
 const API_URL = "https://nsi-api.goedkoop-treinkaartje.nl/api";
-//const API_URL = "https://localhost:7096/api";
+//const API_URL = "https://nsi.maikelvdb.nl/api";
 
 async function searchStations(name) {
   if (name.length < 3) {
@@ -126,6 +126,60 @@ async function loadSearchScroll(id, headerToken, sessionId, from, to, date) {
     sessionId: sessionId,
     scroll: scrollObj,
   };
+}
+
+async function streamSearchData(
+  from,
+  to,
+  date,
+  $container,
+  renderDataCallback
+) {
+  try {
+    const response = await fetch(`${API_URL}/Search/${from}/${to}/${date}`);
+
+    if (!response.ok || !response.body) {
+      throw new Error(
+        "Network response was not ok or streaming not supported."
+      );
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
+
+      buffer += decoder.decode(value, { stream: true });
+      let parts = buffer.split("\n");
+      buffer = parts.pop();
+
+      for (const part of parts) {
+        if (part.trim() === "") continue;
+        try {
+          const jsonArray = JSON.parse(part);
+          renderDataCallback(date, $container, jsonArray, false);
+        } catch (err) {
+          throw new Error("Error parsing JSON:", err, part);
+        }
+      }
+    }
+
+    if (buffer.trim()) {
+      try {
+        const jsonArray = JSON.parse(buffer);
+        renderDataCallback(date, $container, jsonArray, true);
+      } catch (err) {
+        throw new Error("Error parsing final JSON:", err, buffer);
+      }
+    }
+  } catch (error) {
+    throw new Error("Error reading stream:", error);
+  }
 }
 
 const slash = "%2F";

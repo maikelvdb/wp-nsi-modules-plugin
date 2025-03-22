@@ -1,89 +1,87 @@
 const intervalStates = [];
 
-(function ($) {
-  $(document).ready(function () {
-    $(".js-date").each(function () {
-      setDatePicker($(this));
-    });
+jQuery(document).ready(function ($) {
+  $(".js-date").each(function () {
+    setDatePicker($(this));
+  });
 
-    $(".filter-input").each(async function () {
-      const $select = $(this);
-      const $input = $select.find("input[type='text']");
-      const $codeInput = $select.find("input[type='hidden']");
+  $(".filter-input").each(async function () {
+    const $select = $(this);
+    const $input = $select.find("input[type='text']");
+    const $codeInput = $select.find("input[type='hidden']");
 
-      const code = $codeInput.val();
-      if (code) {
-        const name = await getStationByCode(code);
-        $input.val(name);
-      }
+    const code = $codeInput.val();
+    if (code) {
+      const name = await getStationByCode(code);
+      $input.val(name);
+    }
 
-      $input.focus(renderStationsEvent);
-      $input.keyup(renderStationsEvent);
+    $input.focus(renderStationsEvent);
+    $input.keyup(renderStationsEvent);
 
-      $input.blur(function () {
-        const name = $input.data("name");
-        delete intervalStates[name];
+    $input.blur(function () {
+      const name = $input.data("name");
+      delete intervalStates[name];
 
-        setTimeout(() => {
-          $(".nsi-options").remove();
+      setTimeout(() => {
+        $(".nsi-options").remove();
 
-          const $callbackWrapper = $(this).closest(".filter-input");
-          const $wrapper = $(this).parent();
-          const station = $(this).data("station");
-          if (station) {
-            $(this).val(station.name);
-            $codeInput.val(station.beneCode);
+        const $callbackWrapper = $(this).closest(".filter-input");
+        const $wrapper = $(this).parent();
+        const station = $(this).data("station");
+        if (station) {
+          $(this).val(station.name);
+          $codeInput.val(station.beneCode);
 
-            const callback = $callbackWrapper.data("callback");
-            if (callback) {
-              callback.call($callbackWrapper, station.beneCode);
-            }
-            return;
+          const callback = $callbackWrapper.data("callback");
+          if (callback) {
+            callback.call($callbackWrapper, station.beneCode);
           }
+          return;
+        }
 
-          const val = $(this).val();
-          const stations = $wrapper.data("stations");
-          const found = stations.find(
-            (s) => s.name === val || s.beneCode === val
-          );
+        const val = $(this).val();
+        const stations = $wrapper.data("stations");
+        const found = stations.find(
+          (s) => s.name === val || s.beneCode === val
+        );
 
-          if (found) {
-            $codeInput.val(found.beneCode);
-            const callback = $callbackWrapper.data("callback");
-            if (callback) {
-              callback.call($callbackWrapper, found.beneCode);
-            }
-          } else {
-            $(this).val("");
-            $codeInput.val("");
-            $(this).data("station", undefined);
+        if (found) {
+          $codeInput.val(found.beneCode);
+          const callback = $callbackWrapper.data("callback");
+          if (callback) {
+            callback.call($callbackWrapper, found.beneCode);
           }
-        }, 200);
-      });
+        } else {
+          $(this).val("");
+          $codeInput.val("");
+          $(this).data("station", undefined);
+        }
+      }, 200);
     });
+  });
 
-    $(".ns-form-switch").each(function () {
-      const $this = $(this);
-      const $fromInput = $("#from");
-      const $fromCodeInput = $fromInput.next();
-      const $toInput = $("#to");
-      const $toCodeInput = $fromInput.next();
+  $(".ns-form-switch").each(function () {
+    const $this = $(this);
+    const $fromInput = $("#from");
+    const $fromCodeInput = $fromInput.next();
+    const $toInput = $("#to");
+    const $toCodeInput = $fromInput.next();
 
-      $this.click(async function () {
-        await new Promise((resolve) => setTimeout(resolve, 200));
+    $this.click(async function () {
+      await new Promise((resolve) => setTimeout(resolve, 200));
 
-        const from = $fromInput.val();
-        const fromCode = $fromCodeInput.val();
+      const from = $fromInput.val();
+      const fromCode = $fromCodeInput.val();
 
-        const to = $toInput.val();
-        const toCode = $toCodeInput.val();
+      const to = $toInput.val();
+      const toCode = $toCodeInput.val();
 
-        $fromInput.val(to);
-        $fromCodeInput.val(toCode);
+      $fromInput.val(to);
+      $fromCodeInput.val(toCode);
 
-        $toInput.val(from);
-        $toCodeInput.val(fromCode);
-      });
+      $toInput.val(from);
+      $toCodeInput.val(fromCode);
     });
   });
 
@@ -199,4 +197,4 @@ const intervalStates = [];
       },
     });
   }
-})(jQuery);
+});

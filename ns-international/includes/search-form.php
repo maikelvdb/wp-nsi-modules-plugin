@@ -17,10 +17,11 @@ function renderNsInternationalSearch($atts) {
     $marginBottom = get_option(Constants::SPACING_BOTTOM, '15');
 	$content = "<div class=\"ns-international_searchform ns-from\" style=\"--nsi-max-width: {$maxWidth}px; --nsi-margin-bottom: {$marginBottom}px;\"><form action=\"#\" methode=\"get\" class=\"form-container\">";
         
+    $id = uniqid();
     $content .= "<div class=\"ns-stations-group\">";
-        $content .= renderNsStationsSelect(TextValues::get("from"), "from", $a['from']);
+        $content .= renderNsStationsSelect(TextValues::get("from"), "from", $a['from'], $id . '_from');
         $content .= "<div class=\"ns-form-switch\">" . getSwitchSvg() . "</div>";
-        $content .= renderNsStationsSelect(TextValues::get("to"), "to", $a['to']);
+        $content .= renderNsStationsSelect(TextValues::get("to"), "to", $a['to'], $id . '_to');
     $content .= "</div>";
 
     $content .= render_input(TextValues::get("date"), "text", "date", date('d-m-Y', strtotime(date('Y-m-d') . ' +1 day')), "js-date", ["min" => date('Y-m-d')]);
