@@ -199,9 +199,7 @@ function nsInternationalNotice() {
 	) {
 		?>
 			<div class="notice notice-success is-dismissible">
-				<p>
-					<strong>NS International settings saved.</strong>
-				</p>
+				<strong>NS International settings saved.</strong>
 			</div>
 		<?php
 	}

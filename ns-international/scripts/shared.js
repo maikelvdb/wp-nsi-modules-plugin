@@ -36,7 +36,13 @@ async function loadCalendar(from, to, date) {
   const response = await fetchData(url);
   const data = await response.json();
 
-  return data;
+  // get from for response header 'x-station-origin'
+  const fromHeader = response.headers.get("x-station-origin");
+  const toHeader = response.headers.get("x-station-destination");
+  const fromStation = JSON.parse(fromHeader);
+  const toStation = JSON.parse(toHeader);
+
+  return { ...data, from: fromStation, to: toStation };
 }
 
 async function loadDayschedule(from, to, date) {
@@ -162,7 +168,7 @@ async function streamSearchData(
         if (part.trim() === "") continue;
         try {
           const jsonArray = JSON.parse(part);
-          renderDataCallback(date, $container, jsonArray, false);
+          renderDataCallback(date, $container, jsonArray, false, from, to);
         } catch (err) {
           throw new Error("Error parsing JSON:", err, part);
         }
@@ -172,7 +178,7 @@ async function streamSearchData(
     if (buffer.trim()) {
       try {
         const jsonArray = JSON.parse(buffer);
-        renderDataCallback(date, $container, jsonArray, true);
+        renderDataCallback(date, $container, jsonArray, true, from, to);
       } catch (err) {
         throw new Error("Error parsing final JSON:", err, buffer);
       }
@@ -191,21 +197,25 @@ function getTrackingUrl(from, to, date, departure, arival) {
   let path = `${from}${slash}${to}`;
 
   if (date) {
-    path += `${slash}${date}`;
+    path += `${slash}${date.replaceAll("-", "")}`;
   }
 
   if (departure) {
-    path += `${slash}${departure}`;
+    path += `${slash}${departure.replaceAll(":", "")}`;
   }
 
   if (arival) {
-    path += `${slash}${arival}`;
+    path += `${slash}${arival.replaceAll(":", "")}`;
   }
 
   return getBaseTrackingUrl() + path;
 }
 
 function toPrice(price) {
+  if (typeof price !== "number") {
+    price = parseFloat(price);
+  }
+
   return price.toLocaleString("nl-NL", {
     style: "currency",
     currency: "EUR",
@@ -235,4 +245,171 @@ async function fetchData(url, options) {
   return await fetch(url, options ?? null)
     .then((response) => response)
     .catch(() => null);
+}
+
+function createDlJsonItem(
+  to,
+  from,
+  toName,
+  fromName,
+  date,
+  price = null,
+  departureDate = null,
+  arrivalDate = null
+) {
+  try {
+    let departure = departureDate ? new Date(departureDate) : date;
+    let arrival = arrivalDate ? new Date(arrivalDate) : null;
+
+    return {
+      toStation: to,
+      fromStation: from,
+      arrivalStation: toName,
+      arrivalTime: arrival,
+      departureStation: fromName,
+      departureTime: departure,
+      price: !price || price === "0.00" ? null : price,
+      url: getTrackingUrl(
+        from,
+        to,
+        date,
+        getHourMinute(departure),
+        getHourMinute(arrival)
+      ),
+    };
+  } catch (error) {
+    console.error("Error creating DL JSON item:", error);
+    return null;
+  }
+}
+
+function renderDlJson(collection, id = null) {
+  const $ldElement = document.getElementById(id);
+  if ($ldElement?.length > 0) {
+    $ldElement.remove();
+  }
+
+  try {
+    const newLdJson = document.createElement("script");
+    newLdJson.id = id;
+    newLdJson.type = "application/ld+json";
+
+    const currentUrl = new URL(window.location.href);
+    const baseUrl = currentUrl.origin;
+    const image =
+      baseUrl + "/wp-content/plugins/ns-international/styles/gtk-ns-logo.png";
+
+    const allItems = collection.flatMap((trip) => {
+      const trainTrip = {
+        "@type": "TrainTrip",
+        departureStation: {
+          "@type": "TrainStation",
+          name: trip.departureStation,
+        },
+        arrivalStation: {
+          "@type": "TrainStation",
+          name: trip.arrivalStation,
+        },
+        departureTime: trip.departureTime,
+        arrivalTime: trip.arrivalTime,
+        offers: {
+          "@type": "Offer",
+          price: trip.price,
+          priceCurrency: "EUR",
+          url: trip.url,
+        },
+        provider: {
+          "@type": "Organization",
+          name: "NS International",
+          url: "https://www.nsinternational.com",
+        },
+      };
+
+      if (trip.price === "0.00" || trip.price === null) {
+        return [trainTrip];
+      }
+
+      let date;
+      if (trip.departureTime) {
+        const departureDate = new Date(trip.departureTime);
+        const dateStr = departureDate.toISOString().split("T");
+        date = `${dateStr[0]} ${dateStr[1].substring(0, 5)}`;
+      }
+
+      const nicePrice = trip.price ? toPrice(trip.price) : "onbekend";
+      const productName = prepareDlText(
+        php_vars.text_values["dl_product_name"],
+        trip.departureStation,
+        trip.arrivalStation,
+        date,
+        nicePrice
+      );
+      const productDescription = prepareDlText(
+        php_vars.text_values["dl_product_description"],
+        trip.departureStation,
+        trip.arrivalStation,
+        date,
+        nicePrice
+      );
+
+      const product = {
+        "@type": "Product",
+        name: productName, //`Trein van ${trip.departureStation} naar ${trip.arrivalStation} op ${date}`,
+        description: productDescription,
+        /*`Goedkoopste treinkaartje van ${
+          trip.departureStation
+        } naar ${trip.arrivalStation} op ${date} voor ${
+          trip.price ? `€${trip.price}` : "onbekend"
+        }`,*/
+        image: [image],
+        offers: {
+          "@type": "Offer",
+          price: trip.price,
+          priceCurrency: "EUR",
+          url: trip.url,
+        },
+      };
+
+      return [trainTrip, product];
+    });
+
+    const obj = JSON.stringify({
+      "@context": "https://schema.org",
+      "@graph": allItems,
+    });
+
+    console.log("Rendering DL JSON:", obj);
+    newLdJson.textContent = obj;
+
+    document.head.appendChild(newLdJson);
+  } catch (error) {
+    console.error("Error rendering DL JSON:", error);
+  }
+}
+
+function prepareDlText(template, from, to, date, price) {
+  return template
+    .replace("{from}", from)
+    .replace("{to}", to)
+    .replace("{date}", date)
+    .replace("{price}", price);
+}
+
+function getHourMinute(date) {
+  if (!date) {
+    return null;
+  }
+
+  if (!(date instanceof Date)) {
+    date = new Date(date);
+  }
+
+  const digits = date
+    .toLocaleTimeString("nl-NL", {
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+    .replace(":", "");
+
+  return digits.padStart(4, "0");
 }

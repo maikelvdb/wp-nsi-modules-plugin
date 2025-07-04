@@ -38,7 +38,6 @@ jQuery(document).ready(function ($) {
 
       date = date.split("-").reverse().join("");
       const url = `${getBaseTrackingUrl()}${fromCode}%2F${toCode}%2F${date}`;
-
       window.open(url, "_blank");
     });
   });

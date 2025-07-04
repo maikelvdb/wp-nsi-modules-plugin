@@ -23,5 +23,7 @@ class TextValues {
         'show_all' => 'Toon alles',
         'search_tickets' => 'Zoek tickets',
         'error-no-data' => 'Kan geen gegevens ophalen, probeer het later opnieuw.',
+        'dl_product_name' => 'Trein van {from} naar {to} op {date}',
+        'dl_product_description' => 'Goedkoopste treinkaartje van {from} naar {to} op {date} voor {price}'
     ];
 }

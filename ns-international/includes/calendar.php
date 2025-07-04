@@ -55,12 +55,24 @@ function renderNsInternationalCalendar($attrs) {
     
         $content .= createCalendar($date->format('Y-m-d'), 0, $tracking_code, $a['from'], $a['to']);
 
+        $dataItems = [];
+        $from = $a['from'];
+        $to = $a['to'];
         for ($x = 1; $x <= 11; $x++) {
             $newDate = clone $date;
             $newDate->modify("+{$x} month");
             
-            $content .= createCalendar($newDate->format('Y-m-d'), $x, $tracking_code, $a['from'], $a['to']);
+            $content .= createCalendar($newDate->format('Y-m-d'), $x, $tracking_code, $from, $to);
+            array_push($dataItems, array(
+                'from' => $from,
+                'to' => $to,
+                'departure' => $newDate->format('Y-m-d'),
+                'arrival' => null,
+                'price' => '0.00'
+            ));
         }
+
+        $content .= renderLdjson($dataItems, "ldjson-calendar-$from-$to");
 
         $content .= "</div>";
         $content .= "</div>";
@@ -126,6 +138,7 @@ function createCalendar($date, $index, $tracking_code, $from, $to) {
     $activeClass = $index == 0 ? 'active' : '';
     $monthName = getNLMonth($firstDayDate);
     $content = "<div class=\"ns-calendar {$activeClass}\" data-date-str=\"{$monthName}\" data-date=\"{$firstDayDate->format('Y-m-d')}\" data-index=\"{$index}\">";
+    
     $content .= "<div class=\"row header\">" .
         "<div class=\"cell\">M</div><div class=\"cell\">D</div><div class=\"cell\">W</div>" .
         "<div class=\"cell\">D</div><div class=\"cell\">V</div><div class=\"cell\">Z</div><div class=\"cell\">Z</div>" .

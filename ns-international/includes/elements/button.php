@@ -1,13 +1,12 @@
 <?php
-
 function render_button($label, $type = "submit", $className = "", $attributes = []) {
-    $Content = "<button type=\"" . $type . "\" ";
+    $Content = "<button type=\"" . esc_attr($type) . "\"";
 
-    foreach($attributes as $key => $val) {
-        $Content .= " " . $key . "=\"" . $val . "\"";
+    foreach ($attributes as $key => $val) {
+        $Content .= " " . esc_attr($key) . "=\"" . esc_attr($val) . "\"";
     }
 
-    $Content .= " class=\"" . $className . " button\">" . $label . "</button>";
+    $Content .= " class=\"" . esc_attr($className) . " button\">" . esc_html($label) . "</button>";
 
     return $Content;
 }

@@ -55,6 +55,10 @@
     max-width: 100%;
     position: relative;
   }
+  .ns-from .form-container .ns-stations-group .select-wrapper {
+    max-width: unset !important;
+    border-radius: var(--border-radius-size) var(--border-radius-size) var(--border-radius-size) var(--border-radius-size) !important;
+  }
   .ns-from .form-container .ns-stations-group .filter-input {
     max-width: 100%;
     border-radius: var(--border-radius-size) !important;
@@ -108,17 +112,17 @@
   flex-direction: row;
   max-width: calc(100% - 210px);
 }
-.form-container .ns-stations-group .filter-input {
+.form-container .ns-stations-group .select-wrapper {
   max-width: calc(50% - 12.5px);
 }
-.form-container .ns-stations-group .filter-input .label {
+.form-container .ns-stations-group .select-wrapper .label {
   display: none;
 }
-.form-container .ns-stations-group .filter-input:first-child {
+.form-container .ns-stations-group .select-wrapper:first-child {
   border-radius: var(--border-radius-size) 0 0 var(--border-radius-size);
   border-right: none;
 }
-.form-container .ns-stations-group .filter-input:last-child {
+.form-container .ns-stations-group .select-wrapper:last-child {
   border-radius: 0 var(--border-radius-size) var(--border-radius-size) 0;
   border-left: none;
 }
@@ -179,14 +183,20 @@
 .form-container .filter-input input::placeholder {
   color: #4e4e4e;
 }
-.form-container .filter-input {
+.form-container .select-wrapper {
+  background-color: var(--background-grey);
+  outline: solid 3px transparent;
+  transition: all 0.3s ease-in-out;
+  padding: 0 10px;
+  cursor: text;
+  box-sizing: border-box;
   flex-grow: 1;
 }
-.form-container .filter-input:has([invalid=true]):not(:focus-within) {
+.form-container .select-wrapper:has([invalid=true]):not(:focus-within) {
   border-color: rgba(255, 0, 0, 0.5);
   outline-color: rgba(255, 0, 0, 0.1);
 }
-.form-container .filter-input .select-wrapper {
+.form-container .select-wrapper .filter-input {
   position: relative;
   font-size: 14px;
   line-height: 30px;
@@ -576,6 +586,10 @@
     max-width: 100%;
     position: relative;
   }
+  .ns-international-dayschedule .form-container .ns-stations-group .select-wrapper {
+    max-width: unset !important;
+    border-radius: var(--border-radius-size) var(--border-radius-size) var(--border-radius-size) var(--border-radius-size) !important;
+  }
   .ns-international-dayschedule .form-container .ns-stations-group .filter-input {
     max-width: 100%;
     border-radius: var(--border-radius-size) !important;
@@ -919,6 +933,10 @@
     max-width: 100%;
     position: relative;
   }
+  .form-container .ns-stations-group .select-wrapper {
+    max-width: unset !important;
+    border-radius: var(--border-radius-size) var(--border-radius-size) var(--border-radius-size) var(--border-radius-size) !important;
+  }
   .form-container .ns-stations-group .filter-input {
     max-width: 100%;
     border-radius: var(--border-radius-size) !important;
@@ -1048,4 +1066,7 @@
     line-height: 45px !important;
     font-size: 16px !important;
   }
+}
+.content-none {
+  display: contents;
 }/*# sourceMappingURL=modules.css.map */

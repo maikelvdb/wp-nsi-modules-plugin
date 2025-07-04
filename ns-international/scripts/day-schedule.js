@@ -55,7 +55,35 @@ jQuery(document).ready(function ($) {
     }
   }
 
-  function renderDataCallback(date, $container, data, isFinished) {
+  function renderDataCallback(date, $container, data, isFinished, from, to) {
+    try {
+      const id = `nsi-dayschedule-${date}-${from}-${to}`;
+      const items = data.map((i) => {
+        let price = "0.00";
+        if (i.offers?.length > 0) {
+          const lowestOffer = getLowestOffer(i);
+          if (lowestOffer) {
+            price = lowestOffer.totalPrice.amount.toFixed(2);
+          }
+        }
+
+        return createDlJsonItem(
+          to,
+          from,
+          i.itinerary.destination.name,
+          i.itinerary.origin.name,
+          date,
+          price,
+          i.itinerary.origin.departure.plannedLocalDateTime,
+          i.itinerary.destination.arrival.plannedLocalDateTime
+        );
+      });
+
+      renderDlJson(items, id);
+    } catch (err) {
+      console.error("Error rendering data callback:", err);
+    }
+
     data.forEach((entry) => {
       try {
         const $node = createDayscheduleElement(entry, date);
