@@ -1,0 +1,17 @@
+.nsi-dayschedule-short {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 15px;
+  background-color: #f0f0f0;
+}
+.nsi-dayschedule-short .times .time {
+  font-size: 12px;
+  -webkit-text-decoration: underline dotted;
+          text-decoration: underline dotted;
+  color: lightskyblue;
+  margin-right: 10px;
+}/*# sourceMappingURL=style.css.map */

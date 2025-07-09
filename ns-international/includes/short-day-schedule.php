@@ -1,10 +1,11 @@
 <?php
 function renderNsInternationalShortDayschedule($attrs) {
-    $skipDays = get_option(Constants::SKIP_DAYS, '70');
+    global $templateParser;
+
     $a = shortcode_atts( array(
         'from' => '',
         'to'  =>  '',
-        'date-addition' => "+$skipDays day"
+        'date' => date('Y-m-d'),
     ), $attrs );
 
     if (empty($a['to'])) {
@@ -20,15 +21,16 @@ function renderNsInternationalShortDayschedule($attrs) {
         }
     }
 
-    ob_start();
-?>
+    $from = $a['from'];
+    $to = $a['to'];
+    $date = $a['date'];
 
-<h1>Dayschedule short</h1>
+    $response = fetchData("/SearchQueue/$from/$to/$date");
+    if (!isset($response->data) || empty($response->data)) {
+        return "";
+    }
 
-
-
-<?php
-    return ob_get_clean();
+    return $templateParser->render('short-dayschedule', $response->data);
 }
 
 add_shortcode('ns-international-short-dayschedule', 'renderNsInternationalShortDayschedule');

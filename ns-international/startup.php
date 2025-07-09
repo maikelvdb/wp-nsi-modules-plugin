@@ -1,4 +1,6 @@
 <?php
+include_once 'includes/shared.php';
+require_once 'renderer/templates.php';
 include_once 'includes/text-values.php';
 include_once 'includes/settings.php';
 include_once 'includes/modules-settings.php';
@@ -11,6 +13,8 @@ include_once 'includes/short-day-schedule.php';
 
 setlocale(LC_TIME, 'NL_nl');
 
+global $templateParser;
+$templateParser = new TemplateParser(plugin_dir_path(__FILE__) . 'templates');
 
 function nsiEnqueueScripts() {
     wp_enqueue_script( 'jquery' );

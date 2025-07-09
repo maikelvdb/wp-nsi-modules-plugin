@@ -11,4 +11,6 @@ class Constants {
     public const SPACING_BOTTOM = "ns_international_spacing_bottom";
 
     public const DEFAULT_FROM_STATION = "default_from_station";
+
+    public const WP_PLUGIN_MANAGER_USE_DEV = "mvdb::plugin_use_dev";
 }

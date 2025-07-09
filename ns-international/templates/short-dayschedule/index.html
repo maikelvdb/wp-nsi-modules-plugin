@@ -1,0 +1,18 @@
+<!--
+!!SET VARIABELS
+ITEM: [0]
+!!END VARIABELS
+-->
+
+<div class="nsi-dayschedule-short">
+    <h3>
+        {{ ITEM.itinerary.origin.alias ?? ITEM.itinerary.origin.name }} naar {{ ITEM.itinerary.destination.alias ?? ITEM.itinerary.destination.name }} 
+    </h3>
+
+    <div class="times">
+        %%foreach this as trip%%
+        <a href="#" class="time">{{ dateformat(trip.itinerary.origin.departure.plannedLocalDateTime, "H:i") }}</a>
+        %%endforeach%%
+    </div>
+</div>
+

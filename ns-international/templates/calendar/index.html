@@ -1,0 +1,25 @@
+<div class="ns-international_calendar" style="--nsi-max-width: {{ maxWidth }}px; --nsi-margin-bottom: {{ marginBottom }}px;"
+    data-from="{{ from }}" data-to="{{ to }}" data-min-date="{{ minDate }}" data-current-index="{{ startIndex }}">
+    
+    <div class="ns-calendar-header">
+        <div class="ns-calendar-header-left"><button class="prev"><div class="arrow"></div></button></div>
+        <div class="ns-calendar-header-center js-active-date">{{ getNLMonth(startDate) }}</div>
+        <div class="ns-calendar-header-right"><button class="next"><div class="arrow"></div></button></div>
+    </div>
+
+    <div class="ns-calendar-container">
+        <div class="ns-calendar-slider">
+
+
+            <div class="ns-calendar {$activeClass}" data-date-str="{$monthName}" data-date="{{ firstDayDate }}" data-index="{{ index }}">";
+    
+                <div class="row header">
+                    <div class="cell">M</div><div class="cell">D</div><div class="cell">W</div>
+                    <div class="cell">D</div><div class="cell">V</div><div class="cell">Z</div><div class="cell">Z</div>
+                </div>
+                
+
+    
+        </div>
+    </div>
+</div>

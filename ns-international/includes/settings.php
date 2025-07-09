@@ -49,6 +49,7 @@ function addGeneralSettings() {
 	register_setting( Constants::PLUGIN_SLUG, Constants::MAX_WIDTH, 'string' );
 	register_setting( Constants::PLUGIN_SLUG, Constants::SKIP_DAYS, 'string' );
 	register_setting( Constants::PLUGIN_SLUG, Constants::SPACING_BOTTOM, 'string' );
+	register_setting( Constants::PLUGIN_SLUG, Constants::WP_PLUGIN_MANAGER_USE_DEV, 'number' );
 
 	// form
 	add_settings_section(
@@ -105,6 +106,22 @@ function addGeneralSettings() {
 	);
 	
 	add_settings_field(
+		Constants::WP_PLUGIN_MANAGER_USE_DEV,
+		'Updater use previews', // label
+		'updater_input',
+		Constants::PLUGIN_SLUG,
+		$section,
+		array(
+			'label_for' => Constants::WP_PLUGIN_MANAGER_USE_DEV,
+			'class' => Constants::WP_PLUGIN_MANAGER_USE_DEV, // for <tr> element
+			'name' => Constants::WP_PLUGIN_MANAGER_USE_DEV, // pass any custom parameters
+			'saver' => false,
+			'type' => 'bool',
+			'value' => 'true'
+		)
+	);
+	
+	add_settings_field(
 		Constants::SKIP_DAYS,
 		'Aantal dagen vooruit modules', // label
 		'inputField',
@@ -133,6 +150,45 @@ function addGeneralSettings() {
 			'saver' => true
 		)
 	);
+
+	$wp_updater_value = get_option(Constants::WP_PLUGIN_MANAGER_USE_DEV, "0");
+	add_settings_field(
+        Constants::WP_PLUGIN_MANAGER_USE_DEV,
+		'Updater use previews', // label
+		'updaterInput',
+		Constants::PLUGIN_SLUG,
+		$section,
+        array( 
+            'type'         => 'checkbox',
+            'name'         => Constants::WP_PLUGIN_MANAGER_USE_DEV,
+            'label_for'    => 'wp_updater',
+            'value'        => 1,
+            'checked'      => $wp_updater_value == '1' ? 1 : 0,
+			'saver' => false
+		)
+    ); 
+}
+
+function updaterInput($args) { 
+    $checked = '';
+    if($args['checked'] == 1) { 
+		$checked = ' checked="checked" ';
+	 }
+	
+	$html  = '';
+	$html .= '<input id="' . esc_attr( $args['name'] ) . '" 
+	name="' . esc_attr($args['name']) .'" 
+	type="checkbox" ' . $checked . ' value="' . $args['value'] . '" />';
+	if (isset($args['description']) && !empty($args['description'])) {
+		$html .= '<span class="wndspan">' . esc_html( $args['description'] ) .'</span>';
+	}
+	
+	if (isset($args['tip']) && !empty($args['tip'])) {
+		$html .= '<b class="wntip" data-title="'. esc_attr( $args['tip'] ) .'"> ? </b>';
+	}
+
+	$saveBtn = $args['saver'] ? '<input type="submit" name="submit" id="submit" class="button button-primary" value="Save Changes" />' : '';
+	echo "<div class=\"input-saver\">" . $html . $saveBtn . "</div>";
 }
 
 function inputField( $args ){
@@ -167,6 +223,7 @@ function nsInternationalStationsForm() {
 					<option value="ns-international-search" selected>Zoekformulier</option>
 					<option value="ns-international-calendar">Kalender</option>
 					<option value="ns-international-dayschedule">Dagprijzen</option>
+					<option value="ldjson">LD json (google data)</option>
 				</select>
 
 				<div class="stations">

@@ -63,9 +63,10 @@ jQuery(document).ready(function ($) {
 
   $(".ns-form-switch").each(function () {
     const $this = $(this);
-    const $fromInput = $("#from");
+    const id = $this.data("id");
+    const $fromInput = $(`#${(id ? id + '_' : '')}from`);
     const $fromCodeInput = $fromInput.next();
-    const $toInput = $("#to");
+    const $toInput = $(`#${(id ? id + '_' : '')}to`);
     const $toCodeInput = $fromInput.next();
 
     $this.click(async function () {

@@ -35,10 +35,12 @@ function renderLdjson($collection, $id = null) {
         $date = $a['departure'];
         $price = $a['price'];
         
-        $fromStation = fetchData("/stations/bene/" . $from);
+        $fromStationResponse = fetchData("/stations/bene/" . $from);
+        $fromStation = $fromStationResponse ? $fromStationResponse->data : null;
         $fromName = $fromStation['name'] ?? 'Onbekend';
 
-        $toStation = fetchData("/stations/bene/" . $to);
+        $toStationResponse = fetchData("/stations/bene/" . $to);
+        $toStation = $toStationResponse ? $toStationResponse->data : null;
         $toName = $toStation['name'] ?? 'Onbekend';
     
         $trainTrip = array(
@@ -84,7 +86,101 @@ function renderLdjson($collection, $id = null) {
         );
 
         $graphItems[] = $trainTrip;
-        $graphItems[] = $product;
+        if (isset($price)) {
+            $graphItems[] = $product;
+        }
+    }
+
+    $structuredData = array(
+        "@context" => "https://schema.org",
+        "@graph" => $graphItems
+    );
+
+    return '<script type="application/ld+json" id="'. esc_attr($id) . '">'
+        . json_encode($structuredData, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE)
+        . '</script>';
+}
+
+function renderLdjsonWithoutStations($collection, $id = null) {
+	add_filter('the_content', function ($content) {
+		if (has_shortcode($content, 'ns_international_search')) {
+			$content = shortcode_unautop($content);
+		}
+		return $content;
+	});
+
+    $tracking_code = get_option(Constants::TRACKING_CODE_KEY, '');
+    $baseUrl = get_site_url();
+    $image = $baseUrl . "/wp-content/plugins/ns-international/styles/gtk-ns-logo.png";
+
+    $graphItems = [];
+    foreach ($collection as $a) {
+        $dateOnly = date('Ymd', strtotime($a['departure']));
+        $timeOnly = date('Hi', strtotime($a['departure']));
+        $timeOnlyArrival = null;
+        if (isset($a['arrival'])) {
+            $timeOnlyArrival = date('Hi', strtotime($a['arrival']));
+        }
+
+        $trackingUrl = "https://www.nsinternational.com/traintracker/?tt={$tracking_code}&r=%2Fnl%2Ftreintickets-v3%2F%23%2Fsearch%2F{$a['from']}%2F{$a['to']}%2F{$dateOnly}";
+        if ($timeOnly && $timeOnly !== '0000') {
+            $trackingUrl .= "%2F{$timeOnly}";
+        }
+        if ($timeOnlyArrival) {
+            $trackingUrl .= "%2F{$timeOnlyArrival}";
+        }
+    
+        $fromName = $a['from'];
+        $toName = $a['to'];
+        $date = $a['departure'];
+        $price = $a['price'];
+    
+        $trainTrip = array(
+            "@type" => "TrainTrip",
+            "arrivalStation" => array(
+                "@type" => "TrainStation",
+                "name" => $toName
+            ),
+            "arrivalTime" => $a['arrival'],
+            "departureStation" => array(
+                "@type" => "TrainStation",
+                "name" => $fromName
+            ),
+            "departureTime" => $a['departure'],
+            "offers" => array(
+                "@type" => "Offer",
+                "price" => $price,
+                "priceCurrency" => "EUR",
+                "url" => $trackingUrl
+            ),
+            "provider" => array(
+                "@type" => "Organization",
+                "name" => "NS International",
+                "url" => "https://www.nsinternational.com"
+            )
+        );
+
+        $nicePrice = !isset($price) || $price === '0.00' ? 'onbekend' : "€{$price}";
+        $nameText = prepareText(TextValues::get('dl_product_name'), $fromName, $toName, $date, $nicePrice);
+        $descriptionText = prepareText(TextValues::get('dl_product_description'), $fromName, $toName, $date, $nicePrice);
+        
+        $product = array(
+            "@type" => "Product",
+            "name" => $nameText, //"Trein van $fromName naar $toName op $date",
+            "description" => $descriptionText, //"Goedkoopste treinkaartje van $fromName naar $toName op $date voor $nicePrice",
+            "image" => array($image),
+            "offers" => array(
+                "@type" => "Offer",
+                "price" => $price,
+                "priceCurrency" => "EUR",
+                "url" => $trackingUrl
+            )
+        );
+
+        $graphItems[] = $trainTrip;
+        if (isset($price)) {
+            $graphItems[] = $product;
+        }
     }
 
     $structuredData = array(
@@ -120,7 +216,8 @@ function ldJsonStructuredData($attrs) {
         return '';
     }
 
-    $data = fetchData("/Calendar/{$from}/{$to}");
+    $response = fetchData("/Calendar/{$from}/{$to}");
+    $data = $response ? $response->data : null;
     if (is_null($data) || !isset($data['calendarEntries'])) {
         return '';
     }
@@ -154,24 +251,4 @@ function ldJsonStructuredData($attrs) {
     return renderLdjson([$input]);
 }
 
-add_shortcode('nsi-ldjson', 'ldJsonStructuredData');
-
-
-function fetchData($urlPath) {
-    $url = "https://nsi-api.goedkoop-treinkaartje.nl/api" . $urlPath;
-
-    $response = wp_remote_get($url);
-
-    if (is_wp_error($response)) {
-        return null;
-    }
-
-    $body = wp_remote_retrieve_body($response);
-    $data = json_decode($body, true);
-
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        return null;
-    }
-
-    return $data;
-}
+add_shortcode('ldjson', 'ldJsonStructuredData');
