@@ -197,15 +197,15 @@ function getTrackingUrl(from, to, date, departure, arival) {
   let path = `${from}${slash}${to}`;
 
   if (date) {
-    path += `${slash}${date.replaceAll("-", "")}`;
+    path += `${slash}${date.toString().replaceAll("-", "")}`;
   }
 
   if (departure) {
-    path += `${slash}${departure.replaceAll(":", "")}`;
+    path += `${slash}${departure.toString().replaceAll(":", "")}`;
   }
 
   if (arival) {
-    path += `${slash}${arival.replaceAll(":", "")}`;
+    path += `${slash}${arival.toString().replaceAll(":", "")}`;
   }
 
   return getBaseTrackingUrl() + path;

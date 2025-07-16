@@ -49,6 +49,7 @@ function addGeneralSettings() {
 	register_setting( Constants::PLUGIN_SLUG, Constants::MAX_WIDTH, 'string' );
 	register_setting( Constants::PLUGIN_SLUG, Constants::SKIP_DAYS, 'string' );
 	register_setting( Constants::PLUGIN_SLUG, Constants::SPACING_BOTTOM, 'string' );
+	register_setting( Constants::PLUGIN_SLUG, Constants::WP_PLUGIN_MANAGER_API_KEY, 'string' );
 	register_setting( Constants::PLUGIN_SLUG, Constants::WP_PLUGIN_MANAGER_USE_DEV, 'number' );
 
 	// form
@@ -102,6 +103,22 @@ function addGeneralSettings() {
 			'saver' => false,
 			'type' => 'number',
 			'value' => '15'
+		)
+	);
+	
+	add_settings_field(
+		Constants::WP_PLUGIN_MANAGER_API_KEY,
+		'Updater api key', // label
+		'inputField',
+		Constants::PLUGIN_SLUG,
+		$section,
+		array(
+			'label_for' => Constants::WP_PLUGIN_MANAGER_API_KEY,
+			'class' => Constants::WP_PLUGIN_MANAGER_API_KEY, // for <tr> element
+			'name' => Constants::WP_PLUGIN_MANAGER_API_KEY, // pass any custom parameters
+			'saver' => false,
+			'type' => 'string',
+			'value' => ''
 		)
 	);
 	
@@ -223,6 +240,8 @@ function nsInternationalStationsForm() {
 					<option value="ns-international-search" selected>Zoekformulier</option>
 					<option value="ns-international-calendar">Kalender</option>
 					<option value="ns-international-dayschedule">Dagprijzen</option>
+					<option value="nsi-price">Prijs (Optioneel: date="<?= date('Y-m-d'); ?>")</option>
+					<option value="nsi-co2">CO2</option>
 					<option value="ldjson">LD json (google data)</option>
 				</select>
 

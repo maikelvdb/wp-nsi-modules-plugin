@@ -1,0 +1,51 @@
+.nsi-co2 {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 20px;
+  gap: 20px;
+}
+.nsi-co2 .item {
+  flex-grow: 1;
+  text-align: center;
+  box-sizing: border-box;
+  background-color: #fff;
+  box-shadow: var(--nsi-shadow);
+  border-radius: var(--border-radius-size);
+  padding: 15px;
+}
+.nsi-co2 .item .icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.nsi-co2 .item .icon svg {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto;
+  fill: var(--blue);
+}
+.nsi-co2 .item .score {
+  display: flex;
+  font-size: 2.5rem;
+  color: rgba(0, 0, 0, 0.7);
+  margin-top: 5px;
+  align-items: center;
+  justify-content: center;
+}
+.nsi-co2 .item .score span {
+  margin-right: 10px;
+}
+.nsi-co2 .item .score .leaf {
+  width: 30px;
+  height: 30px;
+}
+.nsi-co2 .item .score .leaf.green {
+  fill: var(--green);
+}
+.nsi-co2 .item .score .leaf.orange {
+  fill: var(--orange);
+}
+.nsi-co2 .item .score .leaf.red {
+  fill: var(--red);
+}/*# sourceMappingURL=style.css.map */

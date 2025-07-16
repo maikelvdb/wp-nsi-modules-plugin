@@ -1,6 +1,6 @@
 <?php
 function renderNsInternationalShortDayschedule($attrs) {
-    global $templateParser;
+    global  $nsiTemplateParser;
 
     $a = shortcode_atts( array(
         'from' => '',
@@ -30,7 +30,7 @@ function renderNsInternationalShortDayschedule($attrs) {
         return "";
     }
 
-    return $templateParser->render('short-dayschedule', $response->data);
+    return $nsiTemplateParser->render('short-dayschedule', $response->data);
 }
 
 add_shortcode('ns-international-short-dayschedule', 'renderNsInternationalShortDayschedule');

@@ -10,11 +10,14 @@ include_once 'includes/search-form.php';
 include_once 'includes/calendar.php';
 include_once 'includes/day-schedule.php';
 include_once 'includes/short-day-schedule.php';
+include_once 'includes/price.php';
+include_once 'includes/co2.php';
 
 setlocale(LC_TIME, 'NL_nl');
+define('NSI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
-global $templateParser;
-$templateParser = new TemplateParser(plugin_dir_path(__FILE__) . 'templates');
+global $nsiTemplateParser;
+$nsiTemplateParser = new NsiTemplateParser(plugin_dir_path(__FILE__) . 'templates');
 
 function nsiEnqueueScripts() {
     wp_enqueue_script( 'jquery' );

@@ -3,6 +3,7 @@ jQuery(document).ready(function ($) {
     const $this = $(this);
     const $container = $this.find(".schedule");
     $container.attr("data-has-more", "true");
+    const $buttons = $this.find(".js-day-part");
 
     const $filterSelect = $this.find(".filter-input");
 
@@ -13,6 +14,12 @@ jQuery(document).ready(function ($) {
       const currentCode = $this.data(name);
       if (currentCode !== code) {
         $this.data(name, code);
+        $container.data("data", undefined);
+
+        $buttons.removeClass("active");
+        const $firstButton = $buttons.first();
+        $firstButton.addClass("active");
+
         await renderDaySchedule($this, $container);
       }
     });
@@ -22,10 +29,62 @@ jQuery(document).ready(function ($) {
       const currentDate = $this.data("date");
       if (currentDate !== date) {
         $this.data("date", date);
+
+        $buttons.removeClass("active");
+        const $firstButton = $buttons.first();
+        $firstButton.addClass("active");
+
         await renderDaySchedule($this, $container);
       }
     });
 
+    $buttons.click(async function () {
+      const data = $container.data("data");
+      if (!data) {
+        return;
+      }
+
+      const $button = $(this);
+      if ($button.hasClass("active")) {
+        return;
+      }
+
+      const start = $button.data("start")
+        ? parseInt($button.data("start"), 10)
+        : null;
+      const end = $button.data("end")
+        ? parseInt($button.data("end"), 10)
+        : null;
+
+      const filteredData = data.filter((i) => {
+        const departureTime = new Date(
+          i.itinerary.origin.departure.plannedLocalDateTime
+        );
+        const hour = departureTime.getHours();
+
+        return (
+          (start === null || hour >= start) && (end === null || hour < end)
+        );
+      });
+
+      $buttons.removeClass("active");
+      $button.addClass("active");
+      $container.empty();
+      if (filteredData.length === 0) {
+        const $error = $('<div class="nsi-error"></div>');
+        $error.text(php_vars.text_values["dayschedule-error-no-data"]);
+        $container.append($error);
+        return;
+      }
+
+      const from = $this.data("from");
+      const to = $this.data("to");
+      const dateStr = $this.data("date");
+      const dateValue = dateStr.split("-").reverse().join("-");
+      renderDataCallback(dateValue, $container, filteredData, from, to);
+    });
+
+    $container.data("data", undefined);
     await renderDaySchedule($this, $container);
   });
 
@@ -33,6 +92,7 @@ jQuery(document).ready(function ($) {
     const from = $this.data("from");
     const to = $this.data("to");
     const dateStr = $this.data("date");
+    $container.removeData("data");
 
     const date = dateStr.split("-").reverse().join("-");
 
@@ -45,7 +105,7 @@ jQuery(document).ready(function ($) {
     }
 
     try {
-      await streamSearchData(from, to, date, $container, renderDataCallback);
+      await streamSearchData(from, to, date, $container, collectDataCallback);
     } catch (err) {
       console.error(err);
       const $error = $('<div class="nsi-error"></div>');
@@ -55,7 +115,31 @@ jQuery(document).ready(function ($) {
     }
   }
 
-  function renderDataCallback(date, $container, data, isFinished, from, to) {
+  function collectDataCallback(date, $container, data, isFinished, from, to) {
+    const containerData = $container.data("data");
+    const isFirst = containerData === undefined;
+
+    $container.removeData("data");
+    $container.data("data", data);
+
+    if (isFirst) {
+      const filteredData = data.filter((i) => {
+        const departureTime = new Date(
+          i.itinerary.origin.departure.plannedLocalDateTime
+        );
+        return (
+          departureTime.getHours() >= 0 &&
+          departureTime.getHours() < 12 &&
+          departureTime.getDate() === new Date(date).getDate()
+        );
+      });
+
+      $container.parent().find(".center").find(".loader").remove();
+      renderDataCallback(date, $container, filteredData, from, to);
+    }
+  }
+
+  function renderDataCallback(date, $container, data, from, to) {
     try {
       const id = `nsi-dayschedule-${date}-${from}-${to}`;
       const items = data.map((i) => {
@@ -96,27 +180,6 @@ jQuery(document).ready(function ($) {
         $container.parent().find(".center").find(".loader").remove();
       }
     });
-
-    if (isFinished) {
-      checkShowMore($container);
-      $container.parent().find(".center").find(".loader").remove();
-    }
-  }
-
-  function checkShowMore($container) {
-    if ($container.find(".entry").length < 6) {
-      $container.removeAttr("data-has-more");
-    } else {
-      const $more = $(
-        `<div class="more"><span>${php_vars.text_values["show_all"]}</span></div>`
-      );
-      $more.click(function () {
-        $container.removeAttr("data-has-more");
-        $container.find(".more").remove();
-      });
-
-      $container.append($more);
-    }
   }
 
   function createDayscheduleElement(entry, date) {
@@ -143,6 +206,7 @@ jQuery(document).ready(function ($) {
     const $node = $(`<a href="${url}" target="_blank" class="entry"></a>`);
     $node.attr("data-id", entry.id);
 
+    const $top = $(`<div class="top"></div>`);
     const $left = $(`<div class="left"></div>`);
     const $midd = $(`<div class="midd"></div>`);
 
@@ -151,7 +215,7 @@ jQuery(document).ready(function ($) {
         entry.itinerary.modalities
       )}</div>`
     );
-    $left.append($trains);
+    $top.append($trains);
 
     const $time = $(
       `<div class="time">
@@ -168,6 +232,7 @@ jQuery(document).ready(function ($) {
     );
     $left.append($time);
 
+    $node.append($top);
     $node.append($left);
 
     const offer = getLowestOffer(entry);

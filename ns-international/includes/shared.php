@@ -1,6 +1,7 @@
 <?php
 function fetchData(string $urlPath): ?ApiResponse {
     $url = "https://nsi-api.goedkoop-treinkaartje.nl/api" . $urlPath;
+    
     $response = wp_remote_get($url);
 
     if (is_wp_error($response)) {

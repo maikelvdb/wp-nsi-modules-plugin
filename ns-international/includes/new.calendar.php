@@ -2,7 +2,7 @@
 include_once 'includes.php';
 
 function renderNsInternationalCalendar($attrs) {
-    global $templateParser;
+    global  $nsiTemplateParser;
 
     $skipDays = get_option(Constants::SKIP_DAYS, '70');
     $a = shortcode_atts( array(
@@ -62,7 +62,7 @@ function renderNsInternationalCalendar($attrs) {
     }
 
 
-    return $templateParser->render('calendar', [
+    return $nsiTemplateParser->render('calendar', [
         'maxWidth' => $maxWidth,
         'marginBottom' => $marginBottom,
         'from' => $a['from'],

@@ -31,6 +31,11 @@ function renderNsInternationalDayschedule($attrs) {
     $content = "<div class=\"ns-international-dayschedule\" style=\"--nsi-max-width: {$maxWidth}px; --nsi-margin-bottom: {$marginBottom}px;\" data-from=\"" . $a['from'] . "\" data-to=\"" . $a['to'] . "\" data-date=\"" . $fromDate . "\">";
 
         $content .= "<div class=\"form form-container\">" . getForm($a['from'], $a['to'], $fromDate) . "</div>";
+        $content .= "<div class=\"buttons\">";
+        $content .= "<button type=\"button\" class=\"nsi-button js-day-part active\" data-start=\"\" data-end=\"12\">Ochtend</button>";
+        $content .= "<button type=\"button\" class=\"nsi-button js-day-part\" data-start=\"12\" data-end=\"18\">Middag</button>";
+        $content .= "<button type=\"button\" class=\"nsi-button js-day-part\" data-start=\"18\" data-end=\"\">Avond</button>";
+        $content .= "</div>";
         $content .= "<div class=\"schedule\"></div>";
 
     $content .= '</div>';

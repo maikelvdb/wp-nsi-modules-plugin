@@ -1,9 +1,7 @@
 <?php
 include_once 'includes.php';
 
-function renderNsInternationalCalendar($attrs) {
-    global $templateParser;
-    
+function renderNsInternationalCalendar($attrs) {    
     $skipDays = get_option(Constants::SKIP_DAYS, '70');
     $a = shortcode_atts( array(
         'from' => '',
@@ -32,6 +30,8 @@ function renderNsInternationalCalendar($attrs) {
     $to = $a['to'];
     $response = fetchData("/Calendar/{$from}/{$to}");
     $data = $response ? $response->data : null;
+    $fromStationData = json_decode($response->headers->get('X-Station-Origin'));
+    $toStationData = json_decode($response->headers->get('X-Station-Destination'));
 
     $dateStr = $a['min-date'];
     if (empty($dateStr)) {
@@ -61,7 +61,7 @@ function renderNsInternationalCalendar($attrs) {
         $content .= "<div class=\"ns-calendar-container\"><div class=\"ns-calendar-slider\">";
     
         // $dataItems = [];
-        $content .= createCalendar($date->format('Y-m-d'), 0, $tracking_code, $a['from'], $a['to'], $data);
+        $content .= createCalendar($date->format('Y-m-d'), 0, $tracking_code, $a['from'], $a['to'], $data, $fromStationData, $toStationData);
 
         $from = $a['from'];
         $to = $a['to'];
@@ -69,7 +69,7 @@ function renderNsInternationalCalendar($attrs) {
             $newDate = clone $date;
             $newDate->modify("+{$x} month");
             
-            $content .= createCalendar($newDate->format('Y-m-d'), $x, $tracking_code, $from, $to, $data);
+            $content .= createCalendar($newDate->format('Y-m-d'), $x, $tracking_code, $from, $to, $data, $fromStationData, $toStationData);
         }
 
         // $content .= renderLdjson($dataItems, "ldjson-calendar-$from-$to");
@@ -117,7 +117,7 @@ function getNLMonth($date) {
     
 }
 
-function createCalendar($date, $index, $tracking_code, $from, $to, $data) {
+function createCalendar($date, $index, $tracking_code, $from, $to, $data, $fromStationData, $toStationData) {
     $ldCollection = array();
     $startDate = new DateTime($date);
     $month = $startDate->format('m');
@@ -176,8 +176,8 @@ function createCalendar($date, $index, $tracking_code, $from, $to, $data) {
                 $content .= "<div class=\"current\">{$price}</div>";
 
                 array_push($ldCollection, array(
-                    'from' => $from,
-                    'to' => $to,
+                    'from' => $fromStationData->name,
+                    'to' => $toStationData->name,
                     // 'departure' => $item['firstTravelConnection']['departureDate'],
                     'departure' => $currentDate->format('Y-m-d'),
                     // 'arrival' => $item['firstTravelConnection']['arrivalDate'],
@@ -189,8 +189,8 @@ function createCalendar($date, $index, $tracking_code, $from, $to, $data) {
                 $content .= "<svg width=\"20\" height=\"20\" class=\"search-icon\" role=\"img\" viewBox=\"2 9 20 5\" focusable=\"false\" aria-label=\"Search\"><path class=\"search-icon-path\" d=\"M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z\"></path></svg>";
                 
                 array_push($ldCollection, array(
-                    'from' => $from,
-                    'to' => $to,
+                    'from' => $fromStationData->name,
+                    'to' => $toStationData->name,
                     'departure' => $currentDate->format('Y-m-d'),
                     'arrival' => null,
                     'price' => null,

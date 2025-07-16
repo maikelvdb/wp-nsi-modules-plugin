@@ -12,5 +12,6 @@ class Constants {
 
     public const DEFAULT_FROM_STATION = "default_from_station";
 
+    public const WP_PLUGIN_MANAGER_API_KEY = "mvdb::plugin_apiKey";
     public const WP_PLUGIN_MANAGER_USE_DEV = "mvdb::plugin_use_dev";
 }

@@ -46,7 +46,7 @@
     flex-grow: 1;
     display: flex;
     flex-direction: row;
-    max-width: calc(100% - 210px);
+    max-width: calc(100% - 250px);
 
     .select-wrapper {
       max-width: calc(50% - 12.5px);
@@ -115,6 +115,7 @@
 
     input {
       max-width: 100%;
+      width: 100%;
       line-height: 35px;
       border: none;
       outline: none;
@@ -490,7 +491,7 @@
     box-sizing: border-box;
   }
 
-  @container (max-width: 450px) {
+  @container (max-width: 650px) {
     @include ns-international-dayschedule-small;
 
     .form-container {
@@ -499,11 +500,54 @@
   }
 
   .form {
+    background-color: var(--blue);
     padding: 0;
     padding-bottom: 20px;
     grid-template-columns: 1fr 1fr 100px;
     gap: 10px;
     box-shadow: none;
+    margin-top: -15px;
+    margin-left: -15px;
+    margin-right: -15px;
+    padding: 15px 15px 20px 15px;
+
+    .select-wrapper {
+      border-radius: var(--border-radius-size);
+    }
+  }
+
+  .buttons {
+    background-color: var(--blue);
+    margin-bottom: 10px;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-around;
+    margin-left: -15px;
+    margin-right: -15px;
+    margin-top: -10px;
+
+    .nsi-button {
+      border-radius: 15px;
+      background-color: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 30px;
+      padding: 0 35px;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
+
+      &.active {
+        background-color: rgba(255, 255, 255, 1);
+        color: var(--blue);
+      }
+    }
   }
 
   .schedule {
@@ -513,7 +557,7 @@
 
     &[data-has-more] {
       .entry {
-        display: none;
+        // display: none;
 
         &:nth-child(-n + 6) {
           display: flex;
@@ -521,34 +565,12 @@
       }
     }
 
-    .more {
-      position: relative;
-      width: 100%;
+    .nsi-error {
+      font-size: 14px;
+      font-style: italic;
+      color: rgba(0, 0, 0, 0.5);
       text-align: center;
-      font-size: 12px;
-      margin-top: 10px;
-      color: var(--blue);
-      cursor: pointer;
-
-      span {
-        position: relative;
-        display: inline-block;
-        padding: 5px 15px;
-        border-radius: var(--border-radius-size);
-        background-color: var(--background-grey);
-        z-index: 20;
-        outline: solid 1px #fff;
-      }
-
-      &:before {
-        content: "";
-        position: absolute;
-        border-top: solid 1px rgba(var(--rgb-blue), 0.4);
-        top: 50%;
-        left: 10px;
-        right: 10px;
-        z-index: 1;
-      }
+      margin-top: 20px;
     }
 
     .entry {
@@ -570,8 +592,8 @@
         box-sizing: border-box;
       }
 
-      .left {
-        flex-grow: 1;
+      .top {
+        width: 100%;
 
         .trains {
           display: flex;
@@ -595,6 +617,10 @@
             margin: 0 5px;
           }
         }
+      }
+
+      .left {
+        flex-grow: 1;
 
         .time {
           width: 290px;

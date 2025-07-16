@@ -1,7 +1,7 @@
 <?php
 include_once 'functions/includes.php';
 
-class TemplateParser
+class NsiTemplateParser
 {
     private $basePath;
     private array $builtInFunctions;
@@ -66,7 +66,9 @@ class TemplateParser
 
     private function processVariableDefinitions($content, $data)
     {
-        $variables = [];
+        $variables = [
+            'PLUGIN_PATH' => NSI_PLUGIN_URL,
+        ];
 
         if (preg_match('/<!--\s*!!SET VARIABELS(.*?)!!END VARIABELS\s*-->/s', $content, $matches)) {
             $block = trim($matches[1]);
@@ -312,6 +314,8 @@ class TemplateParser
             'count' => function ($args) { return count($args[0]); },
             'join' => function ($args) { return implode($args[1], $args[0]); },
             'default' => function ($args) { return !empty($args[0]) ? $args[0] : $args[1]; },
+            'floor' => function ($args) { return floor($args[0]); },
+            'ceil' => function ($args) { return ceil($args[0]); },
             'dateformat' => function($args) {
                 $value = $args[0];
                 $format = $args[1] ?? 'Y-m-d';

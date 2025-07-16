@@ -1,9 +1,9 @@
 <?php
 function renderNsInternationalSearch($atts) {
-    global $templateParser;
+    global  $nsiTemplateParser;
 
 	add_filter('the_content', function ($content) {
-		if (has_shortcode($content, 'ns_international_search')) {
+		if (has_shortcode($content, 'ns-international-search')) {
 			$content = shortcode_unautop($content);
 		}
 		return $content;
@@ -26,7 +26,7 @@ function renderNsInternationalSearch($atts) {
 	$id = uniqid();
 
 
-	return $templateParser->render('search-form', [
+	return $nsiTemplateParser->render('search-form', [
 		'id' => $id,
 		
 		'maxWidth' => $maxWidth,

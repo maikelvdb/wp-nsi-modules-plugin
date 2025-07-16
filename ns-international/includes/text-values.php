@@ -24,6 +24,7 @@ class TextValues {
         'search_tickets' => 'Zoek tickets',
         'error-no-data' => 'Kan geen gegevens ophalen, probeer het later opnieuw.',
         'dl_product_name' => 'Trein van {from} naar {to} op {date}',
-        'dl_product_description' => 'Goedkoopste treinkaartje van {from} naar {to} op {date} voor {price}'
+        'dl_product_description' => 'Goedkoopste treinkaartje van {from} naar {to} op {date} voor {price}',
+        'dayschedule-error-no-data'=> 'Geen gegevens gevonden voor deze reis.',
     ];
 }
