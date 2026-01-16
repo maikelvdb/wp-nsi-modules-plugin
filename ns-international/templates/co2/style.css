@@ -48,4 +48,22 @@
 }
 .nsi-co2 .item .score .leaf.red {
   fill: var(--red);
+}
+@media (max-width: 450px) {
+  .nsi-co2 {
+    flex-direction: column;
+  }
+  .nsi-co2 .item {
+    padding: 15px;
+  }
+  .nsi-co2 .item .score {
+    font-size: 1.5rem;
+  }
+  .nsi-co2 .item .score span {
+    margin-right: 10px;
+  }
+  .nsi-co2 .item .score .leaf {
+    width: 20px !important;
+    height: 20px !important;
+  }
 }/*# sourceMappingURL=style.css.map */

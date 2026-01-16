@@ -1,0 +1,36 @@
+<div class="stations__search">
+  <div class="preview_settings">
+    <div class="filter_input">
+      <input
+        type="search"
+        placeholder="Search"
+        class="search"
+        value="Amsterdam"
+      />
+    </div>
+
+    <select class="module_select">
+      <option value="ns-international-search" selected>Zoekformulier</option>
+      <option value="ns-international-calendar">Kalender</option>
+      <option value="ns-international-dayschedule">Dagprijzen</option>
+      <option value="nsi-price">Prijs (Optioneel: date="{{ today() }}")</option>
+      <option value="nsi-co2">CO2</option>
+      <option value="ldjson">LD json (google data)</option>
+    </select>
+
+    <div class="stations">
+      <div class="from js-from-station"></div>
+      <div class="to js-to-station"></div>
+    </div>
+
+    <div class="shortcode_preview">[]</div>
+
+    <div class="ns-copy-confirm" style="display: none">Gekopieerd</div>
+  </div>
+
+  <div class="stations_info">
+    Klik op een station om deze toe te voegen aan de shortcode. (klik
+    rechtermuis voor het '<b>Bestemming</b>' station)
+  </div>
+  <ul class="stations_list"></ul>
+</div>

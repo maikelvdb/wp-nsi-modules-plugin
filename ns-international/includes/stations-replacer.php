@@ -1,38 +1,34 @@
 <?php
 
-class TextValues {
+class StationsReplacer {
 
     private static $VALUES = [];
 
-    public static function get($key) {
+    public static function replace($key) {
         
         if (!array_key_exists($key, self::$VALUES)) {
-            return get_option("nsi_text_$key", self::DEFAULTS[$key]);
+            return get_option("nsi_mapping_$key", StationsReplacer::tryGetDefault($key));
         }
         
         return self::$VALUES[$key];
     }
 
     public const DEFAULTS = [
-        'from' => 'Vertrekstation',
-        'to' => 'Aankomststation',
-        'date' => 'Vertrek op',
-        'search' => 'Zoeken',
-        'view_prices' => 'Bekijk prijzen',
-        'transfer_amount' => '#x overstappen',
-        'no_transfer' => 'Geen overstappen',
-        'show_all' => 'Toon alles',
-        'search_tickets' => 'Zoek tickets',
-        'error-no-data' => 'Kan geen gegevens ophalen, probeer het later opnieuw.',
-        'dl_product_name' => 'Trein van {from} naar {to} op {date}',
-        'dl_product_description' => 'Goedkoopste treinkaartje van {from} naar {to} op {date} voor {price}',
-        'dayschedule-error-no-data'=> 'Geen gegevens gevonden voor deze reis.',
+        'NLASD' => 'NLASC'
     ];
+
+    public static function tryGetDefault($key) {
+        if (array_key_exists($key, self::DEFAULTS)) {
+            return self::DEFAULTS[$key];
+        }
+
+        return $key;
+    }
 
     public static function getAll() {
         global $wpdb;
 
-        $prefix = 'nsi_text_' . '%';
+        $prefix = 'nsi_mapping_' . '%';
         $options = $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT option_name, option_value 
@@ -47,7 +43,7 @@ class TextValues {
         $results = [];
         foreach ($options as $option) {
             // Remove prefix to make key cleaner (optional)
-            $key = str_replace('nsi_text_', '', $option->option_name);
+            $key = str_replace('nsi_mapping_', '', $option->option_name);
             $results[$key] = $option->option_value;
         }
 
@@ -77,7 +73,7 @@ class TextValues {
             self::$VALUES[$key] = $value;
         }
 
-        update_option("nsi_text_$key", $value);
+        update_option("nsi_mapping_$key", $value);
         wp_cache_flush();
     }
 
@@ -86,6 +82,6 @@ class TextValues {
             unset(self::$VALUES[$key]);
         }
 
-        delete_option("nsi_text_$key");
+        delete_option("nsi_mapping_$key");
     }
 }

@@ -232,6 +232,7 @@
 
     .ns-calendar-header-center {
       text-transform: capitalize;
+      font-weight: 600;
     }
 
     .ns-calendar-header-right,
@@ -491,7 +492,7 @@
     box-sizing: border-box;
   }
 
-  @container (max-width: 650px) {
+  @container (max-width: 450px) {
     @include ns-international-dayschedule-small;
 
     .form-container {
@@ -510,6 +511,10 @@
     margin-left: -15px;
     margin-right: -15px;
     padding: 15px 15px 20px 15px;
+
+    @container (max-width: 650px) {
+      @include ns-international-form-small;
+    }
 
     .select-wrapper {
       border-radius: var(--border-radius-size);

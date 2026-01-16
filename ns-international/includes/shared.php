@@ -1,6 +1,7 @@
 <?php
 function fetchData(string $urlPath): ?ApiResponse {
     $url = "https://nsi-api.goedkoop-treinkaartje.nl/api" . $urlPath;
+    // $url = "https://nsi.vandenbosch.dev/api" . $urlPath;
     
     $response = wp_remote_get($url);
 
@@ -30,12 +31,27 @@ class ApiHeaders {
 
     public function get(string $name): ?string {
         $lower = strtolower($name);
+
         foreach ($this->headers as $key => $value) {
             if (strtolower($key) === $lower) {
                 return $value;
             }
         }
+
         return null;
+    }
+
+    public function has(string $name): bool
+    {
+        $lower = strtolower($name);
+
+        foreach ($this->headers as $key => $value) {
+            if (strtolower($key) === $lower) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 
@@ -47,4 +63,14 @@ class ApiResponse {
         $this->data = $data;
         $this->headers = new ApiHeaders($headers);
     }
+}
+
+function fetchStationData($code) {
+    $url = "/Stations/bene/{$code}";
+    $response = fetchData($url);
+    if (is_null($response)) {
+        return null;
+    }
+
+    return $response->data;
 }

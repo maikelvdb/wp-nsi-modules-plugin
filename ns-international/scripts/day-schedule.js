@@ -24,18 +24,28 @@ jQuery(document).ready(function ($) {
       }
     });
 
-    const $dateInput = $this.find(".js-date");
-    $dateInput.find("input").data("callback", async function (date) {
-      const currentDate = $this.data("date");
-      if (currentDate !== date) {
-        $this.data("date", date);
+    const $dateInput = $this.find(".js-date-self");
+    const $dateInputSelector = $dateInput.find("input");
+    $dateInputSelector.datepicker({
+      dateFormat: "dd-mm-yy",
+      minDate: new Date(),
+      onSelect: async function (dateText, $datepicker) {
+        if (dateText) {
+          $($datepicker.input).removeAttr("invalid");
+        }
 
-        $buttons.removeClass("active");
-        const $firstButton = $buttons.first();
-        $firstButton.addClass("active");
+        const currentDate = $this.data("date");
+        if (currentDate !== dateText) {
 
-        await renderDaySchedule($this, $container);
-      }
+          $this.data("date", dateText);
+
+          $buttons.removeClass("active");
+          const $firstButton = $buttons.first();
+          $firstButton.addClass("active");
+
+          await renderDaySchedule($this, $container);
+        }
+      },
     });
 
     $buttons.click(async function () {
@@ -58,7 +68,7 @@ jQuery(document).ready(function ($) {
 
       const filteredData = data.filter((i) => {
         const departureTime = new Date(
-          i.itinerary.origin.departure.plannedLocalDateTime
+          i.departure.time ?? i.departure.plannedTime
         );
         const hour = departureTime.getHours();
 
@@ -71,6 +81,8 @@ jQuery(document).ready(function ($) {
       $button.addClass("active");
       $container.empty();
       if (filteredData.length === 0) {
+        $(".nsi-error").remove();
+
         const $error = $('<div class="nsi-error"></div>');
         $error.text(php_vars.text_values["dayschedule-error-no-data"]);
         $container.append($error);
@@ -92,9 +104,13 @@ jQuery(document).ready(function ($) {
     const from = $this.data("from");
     const to = $this.data("to");
     const dateStr = $this.data("date");
+
+    console.log('Rendering day schedule for:', from, to, dateStr);
+
     $container.removeData("data");
 
-    const date = dateStr.split("-").reverse().join("-");
+    let date = dateStr.split("-").reverse().join("-");
+    date += `T00:00:00`;
 
     $container.empty();
 
@@ -105,9 +121,12 @@ jQuery(document).ready(function ($) {
     }
 
     try {
-      await streamSearchData(from, to, date, $container, collectDataCallback);
+      const result = await searchSchedule(from, to, date);
+      collectDataCallback(date, $container, result?.journeys ?? [], from, to);
     } catch (err) {
       console.error(err);
+
+      $(".nsi-error").remove();
       const $error = $('<div class="nsi-error"></div>');
       $error.text(php_vars.text_values["error-no-data"]);
       $container.parent().find(".center").append($error);
@@ -115,7 +134,7 @@ jQuery(document).ready(function ($) {
     }
   }
 
-  function collectDataCallback(date, $container, data, isFinished, from, to) {
+  function collectDataCallback(date, $container, data, from, to) {
     const containerData = $container.data("data");
     const isFirst = containerData === undefined;
 
@@ -125,7 +144,7 @@ jQuery(document).ready(function ($) {
     if (isFirst) {
       const filteredData = data.filter((i) => {
         const departureTime = new Date(
-          i.itinerary.origin.departure.plannedLocalDateTime
+          i.departure.time ?? i.departure.plannedTime
         );
         return (
           departureTime.getHours() >= 0 &&
@@ -144,22 +163,19 @@ jQuery(document).ready(function ($) {
       const id = `nsi-dayschedule-${date}-${from}-${to}`;
       const items = data.map((i) => {
         let price = "0.00";
-        if (i.offers?.length > 0) {
-          const lowestOffer = getLowestOffer(i);
-          if (lowestOffer) {
-            price = lowestOffer.totalPrice.amount.toFixed(2);
-          }
+        if (i.price) {
+          price = i.price.toFixed(2);
         }
 
         return createDlJsonItem(
           to,
           from,
-          i.itinerary.destination.name,
-          i.itinerary.origin.name,
+          i.departure.name,
+          i.arrival.name,
           date,
           price,
-          i.itinerary.origin.departure.plannedLocalDateTime,
-          i.itinerary.destination.arrival.plannedLocalDateTime
+          i.departure.time ?? i.departure.plannedTime,
+          i.arrival.time ?? i.arrival.plannedTime
         );
       });
 
@@ -174,6 +190,8 @@ jQuery(document).ready(function ($) {
         $container.append($node);
       } catch (err) {
         console.error(err);
+        $(".nsi-error").remove();
+
         const $error = $('<div class="nsi-error"></div>');
         $error.text(php_vars.text_values["error-no-data"]);
         $container.parent().find(".center").append($error);
@@ -183,21 +201,21 @@ jQuery(document).ready(function ($) {
   }
 
   function createDayscheduleElement(entry, date) {
-    const origin = entry.itinerary.origin;
-    const destination = entry.itinerary.destination;
+    const origin = entry.departure;
+    const destination = entry.arrival;
 
-    const departure = origin.departure.plannedLocalDateTime
+    const departure = (origin.time ?? origin.plannedTime)
       .split("T")[1]
       .replace(":", "")
       .substring(0, 4);
-    const arival = destination.arrival.plannedLocalDateTime
+    const arival = (destination.time ?? destination.plannedTime)
       .split("T")[1]
       .replace(":", "")
       .substring(0, 4);
 
     const url = getTrackingUrl(
-      origin.code,
-      destination.code,
+      origin.beneCode,
+      destination.beneCode,
       date.substring(0, 10).replace(/-/g, ""),
       departure,
       arival
@@ -212,7 +230,7 @@ jQuery(document).ready(function ($) {
 
     const $trains = $(
       `<div class="trains">${getTransferDetails(
-        entry.itinerary.modalities
+        entry.stops
       )}</div>`
     );
     $top.append($trains);
@@ -220,13 +238,13 @@ jQuery(document).ready(function ($) {
     const $time = $(
       `<div class="time">
         <div class="start">${getTime(
-          origin.departure.plannedLocalDateTime
+          (origin.time ?? origin.plannedTime)
         )}</div>
         <div class="line"></div>
-        <div class="duration">${niceDuration(entry.itinerary.duration)}</div>
+        <div class="duration">${entry.travelTime}</div>
         <div class="line"></div>
         <div class="end">${getTime(
-          destination.arrival.plannedLocalDateTime
+          (destination.time ?? destination.plannedTime)
         )}</div>
       </div>`
     );
@@ -235,8 +253,7 @@ jQuery(document).ready(function ($) {
     $node.append($top);
     $node.append($left);
 
-    const offer = getLowestOffer(entry);
-    const $price = $(`<div class="price">${getOfferPrice(offer)}</div>`);
+    const $price = $(`<div class="price">${getOfferPrice(entry.price)}</div>`);
     $midd.append($price);
     $node.append($midd);
 
@@ -261,44 +278,18 @@ jQuery(document).ready(function ($) {
     return $node;
   }
 
-  function getTransferDetails(modalities) {
-    const trains = modalities.filter((x) => x.type.toUpperCase() === "TRAIN");
-
-    const transferText = php_vars.text_values["transfer_amount"];
-    return (
-      `<span class="transfers">${transferText.replace(
-        "#",
-        trains.length - 1
-      )}</span>` +
-      trains
-        .map((x) => `<span class="train">${x.name}</span>`)
-        .join(" <span class='separator-gt'>&gt;</span> ")
-    );
-  }
-
-  function niceDuration(duration) {
-    return duration.replace("PT", "").replace("H", "u").replace("M", "m");
-  }
-
-  function getLowestOffer(entry) {
-    if (!entry.offers?.length) {
-      return null;
+  function getTransferDetails(stops) {
+    if (!stops) {
+      return php_vars.text_values["no_transfer"];
     }
-
-    let lowest = null;
-    for (const offer of entry.offers) {
-      if (offer.totalPrice.amount > 0) {
-        lowest = offer;
-        break;
-      }
-    }
-
-    return lowest;
+    
+    const transfer_amount_txt = php_vars.text_values["transfer_amount"];
+    return transfer_amount_txt.replace('#', stops);
   }
 
-  function getOfferPrice(offer) {
-    return offer?.totalPrice?.amount
-      ? `<span class="price">${toFullPrice(offer?.totalPrice?.amount)}</span>`
+  function getOfferPrice(price) {
+    return price
+      ? `<span class="price">${toFullPrice(price)}</span>`
       : "";
     // : `<span class="view">${php_vars.text_values["view_prices"]}</span>`;
   }

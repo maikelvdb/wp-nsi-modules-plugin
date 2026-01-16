@@ -2,6 +2,7 @@ const intervalStates = [];
 
 jQuery(document).ready(function ($) {
   $(".js-date").each(function () {
+    
     setDatePicker($(this));
   });
 
@@ -191,7 +192,7 @@ jQuery(document).ready(function ($) {
           $($this.input).removeAttr("invalid");
         }
 
-        const callback = $this.input.data("callback");
+        const callback = $elem.find("input").data("callback");
         if (callback) {
           callback.call($this.input, dateText);
         }

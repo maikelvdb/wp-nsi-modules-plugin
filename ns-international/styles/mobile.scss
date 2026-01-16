@@ -12,6 +12,11 @@
     }
   }
 
+  .buttons {
+    flex-direction: column !important;
+    gap: 5px !important;
+  }
+
   .midd {
     width: 100% !important;
     margin-top: 15px;

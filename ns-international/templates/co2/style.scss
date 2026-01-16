@@ -58,4 +58,32 @@
       }
     }
   }
+
+  @media (max-width: 450px) {
+    flex-direction: column;
+
+    .item {
+      padding: 15px;
+
+      .icon {
+        svg {
+          // width: 30px !important;
+          // height: 30px !important;
+        }
+      }
+
+      .score {
+        font-size: 1.5rem;
+
+        span {
+          margin-right: 10px;
+        }
+
+        .leaf {
+          width: 20px !important;
+          height: 20px !important;
+        }
+      }
+    }
+  }
 }

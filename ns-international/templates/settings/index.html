@@ -1,0 +1,194 @@
+<div class="wrap">
+  <div class="tab-container">
+    <div class="tabs">
+      <a class="tab" data-tab="shortcode-generator"> Shortcode generator </a>
+      <a class="tab" data-tab="general">Algemeen</a>
+      <a class="tab" data-tab="station-mapping">Station mapping</a>
+      <a class="tab" data-tab="text-mapping">Teksten</a>
+      <a class="tab" data-tab="update-instellingen"> Update instellingen </a>
+    </div>
+
+    <input type="hidden" name="action" value="update" />
+
+    <div class="tab-content" id="general">
+      <h2>Algemene instellingen</h2>
+
+      <form method="post" action="options.php" class="update-settings-form">
+        {{ !UPDATER_NONCE }} {{ !UPDATER_SECTIONS }}
+        <element::settings-input
+          ID="TRACKING_CODE"
+          LABEL="Tracking code"
+          TYPE="text"
+          NAME="{{ this.TRACKING_CODE_NAME }}"
+          VALUE="{{ this.TRACKING_CODE }}"
+        />
+
+        <element::settings-input
+          ID="MAX_WIDTH"
+          LABEL="Maximale breedte modules"
+          TYPE="number"
+          NAME="{{ this.MAX_WIDTH_NAME }}"
+          VALUE="{{ this.MAX_WIDTH }}"
+        />
+
+        <element::settings-input
+          ID="MARGIN_BOTTOM"
+          LABEL="Margin onderkant modules"
+          TYPE="number"
+          NAME="{{ this.MARGIN_BOTTOM_NAME }}"
+          VALUE="{{ this.MARGIN_BOTTOM }}"
+        />
+
+        <element::settings-input
+          ID="DAYS_AHEAD"
+          LABEL="Aantal dagen vooruit modules"
+          TYPE="text"
+          NAME="{{ this.DAYS_AHEAD_NAME }}"
+          VALUE="{{ this.DAYS_AHEAD }}"
+        />
+
+        <element::settings-input
+          ID="DEFAULT_STATION"
+          LABEL="Default vertrekstation code"
+          TYPE="text"
+          NAME="{{ this.DEFAULT_STATION_NAME }}"
+          VALUE="{{ this.DEFAULT_STATION }}"
+        />
+
+        <element::settings-hidden
+          NAME="{{ this.UPDATE_KEY_NAME }}"
+          VALUE="{{ this.UPDATE_KEY }}"
+        />
+
+        <element::settings-hidden
+          NAME="{{ this.UPDATE_PREVIEWS_NAME }}"
+          VALUE="{{ this.UPDATE_PREVIEWS }}"
+        />
+
+        <button type="submit" class="button button-primary">Opslaan</button>
+      </form>
+    </div>
+
+    <div class="tab-content" id="update-instellingen">
+      <h2>Update instellingen</h2>
+
+      <form method="post" action="options.php" class="update-settings-form">
+        {{ !UPDATER_NONCE }} {{ !UPDATER_SECTIONS }}
+        <element::settings-input
+          ID="UPDATE_KEY"
+          LABEL="Updater api key"
+          TYPE="text"
+          NAME="{{ this.UPDATE_KEY_NAME }}"
+          VALUE="{{ this.UPDATE_KEY }}"
+        />
+        <element::settings-checkbox
+          ID="UPDATE_PREVIEWS"
+          LABEL="Gebruik preview versies"
+          NAME="{{ this.UPDATE_PREVIEWS_NAME }}"
+          VALUE="1"
+          CHECKED="{{ this.UPDATE_PREVIEWS }}"
+        />
+        <element::settings-hidden
+          NAME="{{ this.TRACKING_CODE_NAME }}"
+          VALUE="{{ this.TRACKING_CODE }}"
+        />
+
+        <element::settings-hidden
+          NAME="{{ this.MAX_WIDTH_NAME }}"
+          VALUE="{{ this.MAX_WIDTH }}"
+        />
+
+        <element::settings-hidden
+          NAME="{{ this.MARGIN_BOTTOM_NAME }}"
+          VALUE="{{ this.MARGIN_BOTTOM }}"
+        />
+
+        <element::settings-hidden
+          NAME="{{ this.DAYS_AHEAD_NAME }}"
+          VALUE="{{ this.DAYS_AHEAD }}"
+        />
+
+        <element::settings-hidden
+          NAME="{{ this.DEFAULT_STATION_NAME }}"
+          VALUE="{{ this.DEFAULT_STATION }}"
+        />
+
+        <button type="submit" class="button button-primary">Opslaan</button>
+      </form>
+    </div>
+
+    <div class="tab-content" id="shortcode-generator">
+      <h2>Shortcode generator</h2>
+      <element::shortcode-generator />
+    </div>
+
+    <div class="tab-content" id="station-mapping">
+      <h2>Station mapping</h2>
+      <form method="post" class="station-mappings">
+        <div class="station-mapping">
+          %%foreach MAPPINGS as station%%
+          <div class="station-mapping-item">
+            <input
+              type="text"
+              name="stations[{{ index }}][key]"
+              value="{{ station.key }}"
+              placeholder="Origineel station code"
+            />
+            <input
+              type="text"
+              name="stations[{{ index }}][value]"
+              value="{{ station.value }}"
+              placeholder="Vervangend station code"
+            />
+            <button type="button" class="button remove-button">Remove</button>
+          </div>
+          %%endforeach%%
+        </div>
+        <div class="station-mapping-actions">
+          <button
+            type="button"
+            class="button button-secondary add-station-mapping"
+          >
+            Voeg station toe
+          </button>
+          <button
+            type="submit"
+            class="button button-primary save-station-mapping"
+          >
+            Opslaan
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="tab-content" id="text-mapping">
+      <h2>Teksten</h2>
+      <form method="post" class="text-mappings">
+        <div class="text-mapping">
+          %%foreach TEXTS as text%%
+          <div class="text-mapping-item">
+            <label for="text_{{ index }}">{{ text.key }}</label>
+            <input
+              type="hidden"
+              name="text[{{ index }}][key]"
+              value="{{ text.key }}"
+            />
+            <input
+              type="text"
+              id="text_{{ index }}"
+              name="text[{{ index }}][value]"
+              value="{{ text.value }}"
+              placeholder="Tekst..."
+            />
+          </div>
+          %%endforeach%%
+        </div>
+        <div class="text-mapping-actions">
+          <button type="submit" class="button button-primary save-text-mapping">
+            Opslaan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

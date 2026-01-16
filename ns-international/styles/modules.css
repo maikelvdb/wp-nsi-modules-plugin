@@ -320,6 +320,7 @@
 }
 .ns-international_calendar .ns-calendar-header .ns-calendar-header-center {
   text-transform: capitalize;
+  font-weight: 600;
 }
 .ns-international_calendar .ns-calendar-header .ns-calendar-header-right,
 .ns-international_calendar .ns-calendar-header .ns-calendar-header-left {
@@ -390,7 +391,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  color: rgb(0, 0, 1);
+  color: rgb(0, 0, 0.5);
   border: none;
   outline: none;
 }
@@ -525,7 +526,7 @@
 .ns-international-dayschedule * {
   box-sizing: border-box;
 }
-@container (max-width: 650px) {
+@container (max-width: 450px) {
   .ns-international-dayschedule .left {
     width: 100% !important;
   }
@@ -535,6 +536,10 @@
   .ns-international-dayschedule .left .time .start,
   .ns-international-dayschedule .left .time .end {
     width: 45px !important;
+  }
+  .ns-international-dayschedule .buttons {
+    flex-direction: column !important;
+    gap: 5px !important;
   }
   .ns-international-dayschedule .midd {
     width: 100% !important;
@@ -636,6 +641,61 @@
   margin-left: -15px;
   margin-right: -15px;
   padding: 15px 15px 20px 15px;
+}
+@container (max-width: 650px) {
+  .ns-international-dayschedule .form {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .ns-international-dayschedule .form .filter-input,
+  .ns-international-dayschedule .form .js-date {
+    padding: 5px 10px !important;
+  }
+  .ns-international-dayschedule .form .filter-input input,
+  .ns-international-dayschedule .form .js-date input {
+    font-size: 17px !important;
+  }
+  .ns-international-dayschedule .form .ns-stations-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 100%;
+    position: relative;
+  }
+  .ns-international-dayschedule .form .ns-stations-group .select-wrapper {
+    max-width: unset !important;
+    border-radius: var(--border-radius-size) var(--border-radius-size) var(--border-radius-size) var(--border-radius-size) !important;
+  }
+  .ns-international-dayschedule .form .ns-stations-group .filter-input {
+    max-width: 100%;
+    border-radius: var(--border-radius-size) !important;
+  }
+  .ns-international-dayschedule .form .ns-stations-group .filter-input .option {
+    line-height: 40px !important;
+    font-size: 17px !important;
+  }
+  .ns-international-dayschedule .form .ns-stations-group .ns-form-switch {
+    position: absolute;
+    top: 12px;
+    right: 10px;
+    width: 30px;
+    border: none;
+    transform: rotate(90deg);
+  }
+  .ns-international-dayschedule .form .js-date {
+    width: 100%;
+    max-width: 100%;
+  }
+  .ns-international-dayschedule .form .button-wrapper {
+    width: 100%;
+    max-width: 100%;
+  }
+  .ns-international-dayschedule .form .button-wrapper .button {
+    width: 100%;
+    max-width: 100%;
+    padding: 5px 10px !important;
+    font-size: 18px !important;
+  }
 }
 .ns-international-dayschedule .form .select-wrapper {
   border-radius: var(--border-radius-size);
@@ -1048,6 +1108,10 @@
   .ns-international-dayschedule .left .time .start,
   .ns-international-dayschedule .left .time .end {
     width: 45px !important;
+  }
+  .ns-international-dayschedule .buttons {
+    flex-direction: column !important;
+    gap: 5px !important;
   }
   .ns-international-dayschedule .midd {
     width: 100% !important;

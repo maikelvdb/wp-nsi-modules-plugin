@@ -138,7 +138,7 @@ class NsiTemplateParser
 
     private function processConditions($content, $data, $variables = [])
     {
-        return preg_replace_callback('/%%if \s*(.*?)%%(.*?)%%else%%(.*?)%%endif%%/s', function ($matches) use ($data, $variables) {
+        $conditionContent = preg_replace_callback('/%%if \s*(.*?)%%(.*?)%%else%%(.*?)%%endif%%/s', function ($matches) use ($data, $variables) {
             $condition = trim($matches[1]);
             $trueContent = $matches[2];
             $falseContent = $matches[3];
@@ -148,12 +148,31 @@ class NsiTemplateParser
 
             return $conditionValue ? $trueContent : $falseContent;
         }, $content);
+
+        $conditionContent = preg_replace_callback('/%%if \s*(.*?)%%(.*?)%%endif%%/s', function ($matches) use ($data, $variables) {
+            $condition = trim($matches[1]);
+            $trueContent = $matches[2];
+
+            // Evaluate condition
+            $conditionValue = $this->evaluateCondition($condition, $data, $variables);
+
+            return $conditionValue ? $trueContent : '';
+        }, $conditionContent);
+
+        return $conditionContent;
     }
 
     private function replaceTextVariables($content, $context, $variables = [])
     {
         return preg_replace_callback('/{{\s*(.*?)\s*}}/', function ($matches) use ($context, $variables) {
             $dataPath = trim($matches[1]);
+
+            $isRaw = false;
+            if (str_starts_with($dataPath, '!')) {
+                $isRaw = true;
+                $dataPath = substr($dataPath, 1);
+            }
+
             $nullCoalescing = explode('??', $dataPath);
             if ($nullCoalescing && count($nullCoalescing) > 1) {
                 $dataPath = trim($nullCoalescing[0]);
@@ -167,6 +186,10 @@ class NsiTemplateParser
                 } else {
                     $value = $this->tryGetValue($defaultValue, $context, $variables);
                 }
+            }
+
+            if ($isRaw) {
+                return (string) $value;
             }
 
             return htmlspecialchars(is_scalar($value) ? $value : json_encode($value), ENT_QUOTES, 'UTF-8');
@@ -188,7 +211,7 @@ class NsiTemplateParser
         return $this->resolveDataPath($path, $context);
     }
 
-    private function evaluateCondition($condition, $context)
+    private function evaluateCondition($condition, $context, $variables = [])
     {
         // Replace data paths with their values in the condition
         $condition = preg_replace_callback('/{{\s*(.*?)\s*}}/', function ($matches) use ($context, $variables) {
@@ -270,17 +293,24 @@ class NsiTemplateParser
 
     private function renderElements($content)
     {
-        return preg_replace_callback('/<element::([\w-]+) (.*?)\/>/', function ($matches) {
+        return preg_replace_callback('/<element::([\w-]+)\s+(.*?)\/>/s', function ($matches) {
             $elementName = $matches[1];
+            
             $elementPath = $this->basePath . 'elements/' . $elementName . '/index.html';
             if (!file_exists($elementPath)) {
-                die("Element not found: $elementPath");
                 error_log("Element not found: $elementPath");
                 return '';
             }
 
             $elementContent = file_get_contents($elementPath);
+            if (!$elementContent) {
+                error_log("Failed to load element content from: $elementPath");
+                return '';
+            }
+
             $elementContent = $this->replaceElementAttributes($elementContent, $matches[2]);
+            $elementContent = $this->resolveBuiltInFunctions($elementContent, $matches[2]);
+            $elementContent = $this->processConditions($elementContent, $matches[2]);
 
             return $elementContent;
         }, $content);
@@ -327,6 +357,12 @@ class NsiTemplateParser
                     return '';
                 }
             },
+            'isTrue' => function ($args) {
+                return !empty($args[0]) && ($args[0] === '1' || $args[0] === 'true');
+            },
+            'isFalse' => function ($args) {
+                return empty($args[0]) || ($args[0] !== '1' && $args[0] !== 'true');
+            }
         ];
 
         foreach (get_declared_classes() as $className) {

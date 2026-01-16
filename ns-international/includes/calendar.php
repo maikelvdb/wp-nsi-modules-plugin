@@ -26,12 +26,36 @@ function renderNsInternationalCalendar($attrs) {
     $maxWidth = get_option(Constants::MAX_WIDTH, '900');
     $marginBottom = get_option(Constants::SPACING_BOTTOM, '15');
 
+    $content = '';
+
     $from = $a['from'];
     $to = $a['to'];
+
     $response = fetchData("/Calendar/{$from}/{$to}");
     $data = $response ? $response->data : null;
-    $fromStationData = json_decode($response->headers->get('X-Station-Origin'));
-    $toStationData = json_decode($response->headers->get('X-Station-Destination'));
+
+    $fromStationData = null;
+    $toStationData = null;
+
+    if ($response->headers->has('X-Station-Origin')) {
+        $fromStationData = json_decode(
+            $response->headers->get('X-Station-Origin'),
+            true
+        );
+    }
+    else {
+        $fromStationData = fetchStationData($from);
+    }
+
+    if ($response->headers->has('X-Station-Destination')) {
+        $toStationData = json_decode(
+            $response->headers->get('X-Station-Destination'),
+            true
+        );
+    }
+    else {
+        $toStationData = fetchStationData($to);
+    }
 
     $dateStr = $a['min-date'];
     if (empty($dateStr)) {
@@ -50,7 +74,7 @@ function renderNsInternationalCalendar($attrs) {
 
     $tracking_code = get_option(Constants::TRACKING_CODE_KEY, '');
 
-    $content = "<div class=\"ns-international_calendar\" style=\"--nsi-max-width: {$maxWidth}px; --nsi-margin-bottom: {$marginBottom}px;\" data-from=\"{$a['from']}\" data-to=\"{$a['to']}\" data-min-date=\"{$a['min-date']}\" data-current-index=\"{$startIndex}\">";
+    $content .= "<div class=\"ns-international_calendar\" style=\"--nsi-max-width: {$maxWidth}px; --nsi-margin-bottom: {$marginBottom}px;\" data-from=\"{$a['from']}\" data-to=\"{$a['to']}\" data-min-date=\"{$a['min-date']}\" data-current-index=\"{$startIndex}\">";
     
     $content .= "<div class=\"ns-calendar-header\">".
         "<div class=\"ns-calendar-header-left\"><button class=\"prev\"><div class=\"arrow\"></div></button></div>".
@@ -156,8 +180,14 @@ function createCalendar($date, $index, $tracking_code, $from, $to, $data, $fromS
         $isDisabled = $isCurrentMonth ? '' : ' disabled';
         $dayNr = $currentDate->format('j');
         $item = getMatch($data, $currentDate);
+
+        $hasPrice = !empty($item)
+                    && isset($item['price']['lowest'])
+                    && $item['price']['lowest'] !== 0
+                    && $item['price']['lowest'] !== null;
+
         
-        $searchIcon = $isCurrentMonth && empty($item) ? ' search-icon' : '';
+        $searchIcon = $isCurrentMonth && !$hasPrice ? ' search-icon' : '';
 
         $className = '';
         if (!empty($item) && isset($item['price']['category']) && $isCurrentMonth) {
@@ -168,7 +198,7 @@ function createCalendar($date, $index, $tracking_code, $from, $to, $data, $fromS
         $content .= "<a href=\"" . getUrl($from, $to, $currentDate->format('Ymd'), $tracking_code) . "\" target=\"_blank\" class=\"cell nsi-cta{$isDisabled}{$searchIcon}\" data-date=\"" . $currentDate->format('Y-m-d') . "\"><div class=\"daynr\" data-day=\"" . $dayNr . "\"></div><div class=\"price {$className}\">";
         
         if ($isCurrentMonth) {
-            if (!empty($item)) {
+            if ($hasPrice) {
                 $price = toPrice($item['price']['lowest']);
                 $price = trim($price);
                 $price = str_replace('€', '', $price);
@@ -176,8 +206,8 @@ function createCalendar($date, $index, $tracking_code, $from, $to, $data, $fromS
                 $content .= "<div class=\"current\">{$price}</div>";
 
                 array_push($ldCollection, array(
-                    'from' => $fromStationData->name,
-                    'to' => $toStationData->name,
+                    'from' => (!empty($fromStationData) && !empty($fromStationData->name)) ? $fromStationData->name : '',
+                    'to' => (!empty($toStationData) && !empty($toStationData->name)) ? $toStationData->name : '',
                     // 'departure' => $item['firstTravelConnection']['departureDate'],
                     'departure' => $currentDate->format('Y-m-d'),
                     // 'arrival' => $item['firstTravelConnection']['arrivalDate'],
@@ -189,8 +219,8 @@ function createCalendar($date, $index, $tracking_code, $from, $to, $data, $fromS
                 $content .= "<svg width=\"20\" height=\"20\" class=\"search-icon\" role=\"img\" viewBox=\"2 9 20 5\" focusable=\"false\" aria-label=\"Search\"><path class=\"search-icon-path\" d=\"M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z\"></path></svg>";
                 
                 array_push($ldCollection, array(
-                    'from' => $fromStationData->name,
-                    'to' => $toStationData->name,
+                    'from' => (!empty($fromStationData) && !empty($fromStationData->name)) ? $fromStationData->name : '',
+                    'to' => (!empty($toStationData) && !empty($toStationData->name)) ? $toStationData->name : '',
                     'departure' => $currentDate->format('Y-m-d'),
                     'arrival' => null,
                     'price' => null,

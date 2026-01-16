@@ -103,12 +103,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #fff;
+  background-color: #e3e3e3;
   padding: 10px;
   width: 250px;
   border-radius: 3px;
-  outline: solid 3px #fff;
-  border: solid 1px #fff;
+  outline: solid 3px #e3e3e3;
+  border: solid 1px #e3e3e3;
   cursor: default;
   opacity: 0.8;
   transition: all 0.3s ease-in-out;

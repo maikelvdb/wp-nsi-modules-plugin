@@ -1,5 +1,5 @@
 const API_URL = "https://nsi-api.goedkoop-treinkaartje.nl/api";
-//const API_URL = "https://nsi.maikelvdb.nl/api";
+// const API_URL = "https://nsi.vandenbosch.dev/api";
 
 async function searchStations(name) {
   if (name.length < 3) {
@@ -45,146 +45,22 @@ async function loadCalendar(from, to, date) {
   return { ...data, from: fromStation, to: toStation };
 }
 
-async function loadDayschedule(from, to, date) {
-  const url = `${API_URL}/dayschedule/${from}/${to}/${date}`;
-
-  try {
-    const response = await fetchData(url);
-    const data = await response.json();
-
-    return data;
-  } catch {
-    return null;
-  }
-}
-
 async function searchSchedule(from, to, date) {
   const url = `${API_URL}/search/${from}/${to}/${date}`;
 
   try {
     const response = await fetchData(url);
-    const sessionId = response.headers.get("X-Session-Id");
-    const fromCache = response.headers.get("x-from-cache");
+    const fromHeader = response.headers.get("x-station-origin");
+    const toHeader = response.headers.get("x-station-destination");
+    const fromStation = JSON.parse(fromHeader);
+    const toStation = JSON.parse(toHeader);
 
     const data = await response.json();
-
-    let scrollObj = null;
-    if (data.data.scroll.later === "NEXT_DEPARTURE") {
-      scrollObj = {
-        id: data.data.scroll.searchId,
-        token: response.headers.get("x-nsiapi-convid"),
-      };
-    } else if (fromCache !== "1") {
-      searchScheduleSetCache(from, to, date, data, response.headers);
-    }
-
     return {
-      data: data.data.travelOffers,
-      sessionId: sessionId,
-      scroll: scrollObj,
-      fromCache: fromCache === "1",
+      journeys: data, from: fromStation, to: toStation
     };
   } catch {
     return null;
-  }
-}
-
-async function searchScheduleSetCache(from, to, date, response, headers) {
-  const url = `${API_URL}/set-cache/search/${from}/${to}/${date}`;
-
-  const headerList = Array.from(headers).map((x) => ({
-    key: x[0],
-    value: x[1],
-  }));
-
-  fetchData(url, {
-    method: "POST",
-    body: JSON.stringify({
-      duration: 60,
-      content: JSON.stringify(response),
-      headers: headerList,
-    }),
-  });
-}
-
-async function loadSearchScroll(id, headerToken, sessionId, from, to, date) {
-  const url = `${API_URL}/SearchScroll/${id}/${headerToken}`;
-
-  const response = await fetchData(url, {
-    headers: {
-      "X-Session-Id": sessionId,
-    },
-  });
-  const data = await response.json();
-
-  let scrollObj = null;
-  if (data.data.scroll.later === "NEXT_DEPARTURE") {
-    scrollObj = {
-      id: data.data.scroll.searchId,
-      token: response.headers.get("x-nsiapi-convid"),
-    };
-  } else {
-    searchScheduleSetCache(from, to, date, data, response.headers);
-  }
-
-  return {
-    data: data.data.travelOffers,
-    sessionId: sessionId,
-    scroll: scrollObj,
-  };
-}
-
-async function streamSearchData(
-  from,
-  to,
-  date,
-  $container,
-  renderDataCallback
-) {
-  try {
-    const response = await fetch(`${API_URL}/Search/${from}/${to}/${date}`);
-
-    if (!response.ok || !response.body) {
-      throw new Error(
-        "Network response was not ok or streaming not supported."
-      );
-    }
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder("utf-8");
-    let buffer = "";
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) {
-        break;
-      }
-
-      buffer += decoder.decode(value, { stream: true });
-      let parts = buffer.split("\n");
-      buffer = parts.pop();
-
-      for (const part of parts) {
-        if (part.trim() === "") continue;
-        try {
-          const jsonArray = JSON.parse(part);
-          renderDataCallback(date, $container, jsonArray, false, from, to);
-        } catch (err) {
-          throw new Error("Error parsing JSON:", err, part);
-        }
-      }
-    }
-
-    if (buffer.trim()) {
-      try {
-        const jsonArray = JSON.parse(buffer);
-        renderDataCallback(date, $container, jsonArray, true, from, to);
-      } catch (err) {
-        throw new Error("Error parsing final JSON:", err, buffer);
-      }
-    }
-  } catch (error) {
-    throw new Error("Error reading stream:", error);
   }
 }
 
@@ -378,7 +254,6 @@ function renderDlJson(collection, id = null) {
       "@graph": allItems,
     });
 
-    console.log("Rendering DL JSON:", obj);
     newLdJson.textContent = obj;
 
     document.head.appendChild(newLdJson);

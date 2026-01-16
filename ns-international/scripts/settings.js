@@ -121,4 +121,44 @@ jQuery(document).ready(async function ($) {
 
     $shortCodePreview.text(shortCode + " /]");
   }
+
+  $(".station-mapping-item").each(function () {
+    const $item = $(this);
+    const $removeBtn = $item.find(".remove-button");
+
+    $removeBtn.click(function () {
+      if ($(".station-mapping-item").length > 1) {
+        $item.remove();
+      } else {
+        $item.find("input").val("");
+      }
+    });
+  });
+
+  $(".add-station-mapping").click(function () {
+    const $stationMapping = $(".station-mapping");
+    const $newStationMapping = $stationMapping
+      .find(".station-mapping-item")
+      .first()
+      .clone();
+
+    $newStationMapping.find("input").val("");
+    const currentIndex = parseInt(
+      $stationMapping
+        .find(".station-mapping-item")
+        .last()
+        .find("input")
+        .last()
+        .attr("name")
+        .match(/\d+/)[0]
+    );
+    const newIndex = currentIndex + 1;
+    $newStationMapping.find("input").each(function () {
+      const name = $(this).attr("name");
+      const newName = name.replace(/\d+/, newIndex);
+      $(this).attr("name", newName);
+    });
+
+    $newStationMapping.appendTo(".station-mapping");
+  });
 });
